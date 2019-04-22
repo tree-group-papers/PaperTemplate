@@ -1,0 +1,886 @@
+
+% ----- preamble -----
+% {{{
+% slightly modify achemso for RSC submission
+% http://tex.stackexchange.com/questions/2642/using-ama-reference-style-while-using-the-achemso-sty
+\let\LaTeXbibliographystle\bibliographystyle
+\def\bibliographystyle#1{}
+\newif\ifdoublecol
+\doublecoltrue
+%\doublecolfalse
+\ifdoublecol
+\documentclass[journal=mamobx, layout=twocolumn]{achemso}
+\else
+\documentclass[journal=mamobx]{achemso}
+\fi
+\let\bibliographystyle\LaTeXbibliographystle
+\bibliographystyle{rsc}
+
+\usepackage{lipsum}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{graphicx}
+\usepackage{amsmath, amssymb}
+\allowdisplaybreaks[1] % allow column/page breaks in gather environment
+%http://tex.stackexchange.com/questions/57338/how-can-i-allow-gather-to-break-between-pages
+\usepackage{bm}
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\erf}{erf}
+\DeclareMathOperator{\erfc}{erfc}
+\raggedbottom
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+
+\usepackage{xr} % crossreferencing to main manuscript
+\externaldocument[SI:]{suppinfo}
+
+% custom commands
+\newcommand{\comment}[1]{\ifclean\else{\bf \footnotesize \color{Green}(DRT -- #1)}\fi}
+\newcommand{\txtf}{\mathrm{f}}
+\newcommand{\txtb}{\mathrm{b}}
+
+% ** Alter some LaTeX defaults for better treatment of figures **
+% see here: https://aty.sdsu.edu/bibliog/latex/floats.html
+%   -- see also p.105 of "TeX Unbound" for suggested values.
+%   -- see also pp. 199-200 of Lamport's "LaTeX" book for details.
+%   General parameters, for ALL pages:
+\renewcommand{\topfraction}{0.9}	% max fraction of floats at top
+\renewcommand{\bottomfraction}{0.8}	% max fraction of floats at bottom
+%   Parameters for TEXT pages (not float pages):
+\setcounter{topnumber}{2}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{4}     % 2 may work better
+\setcounter{dbltopnumber}{2}    % for 2-column pages
+\renewcommand{\dbltopfraction}{0.9}	% fit big float above 2-col. text
+\renewcommand{\textfraction}{0.07}	% allow minimal text w. figs
+%   Parameters for FLOAT pages (not text pages):
+\renewcommand{\floatpagefraction}{0.7}	% require fuller float pages
+% N.B.: floatpagefraction MUST be less than topfraction !!
+\renewcommand{\dblfloatpagefraction}{0.7}	% require fuller float pages
+% remember to use [htp] or [htpb] for placement
+% }}}
+
+% --- Title and Author Info ---
+% {{{
+\title{Mass-transfer driven spinodal decomposition in a ternary polymer solution}
+\author{Douglas R. Tree}
+\affiliation{Chemical Engineering Department, Brigham Young University, Provo, Utah}
+\author{Lucas F. Dos Santos }
+\affiliation{State University of Maring\'{a}, Maring\'{a}, Paran\'{a}, Brazil}
+\author{Caden B. Wilson}
+\affiliation{Chemical Engineering Department, Brigham Young University, Provo, Utah}
+\author{Timothy R. Scott}
+\affiliation{Chemical Engineering Department, Brigham Young University, Provo, Utah}
+\author{Jan Ulric Garcia}
+\affiliation{Chemical Engineering Department, University of California, Santa Barbara}
+\author{Glenn H. Fredrickson}
+\affiliation{Materials Research Laboratory, University of California, Santa Barbara}
+\alsoaffiliation{Materials Department, University of California, Santa Barbara}
+\alsoaffiliation{Chemical Engineering Department, University of California, Santa Barbara}
+\date{\today}
+\email{tree.doug@byu.edu}
+
+% for a one column abstract using two column output
+\newcommand*{\abstracttext}{
+\lipsum[1]
+}
+
+\ifdoublecol
+\let\oldmaketitle\maketitle
+\let\maketitle\relax
+\fi
+% }}}
+
+% ----- document text -----
+\begin{document}
+
+% Abstract (one column, much better looking...)
+% {{{
+\ifdoublecol
+\twocolumn[
+\begin{@twocolumnfalse}
+  \oldmaketitle
+  \begin{abstract}
+Nonsolvent induced phase separation (NIPS) is a widely occuring process used in industrial membrane production, nanotechnology and Nature to produce microstructured polymer materials.
+A variety of process-dependent morphologies are produced when a polymer solution is exposed to a nonsolvent that, following a period where mass is exchanged, precipitates and solidifies the polymer.
+Despite years of investigation, both experimental and theoretical, many questions surround the pathways to the microstructures that NIPS can produce.
+Here, we provide simulation results from a model that simultaneously captures both the processess of solvent/nonsolvent exchange and phase separation.
+We show that the time it takes the nonsolvent to diffuse to the bottom of the film is an important timescale, and that phase separation is possible at times both much smaller and much larger than this scale.
+Our results include both one-dimensional simulations of the mass transfer kinetics and two- and three-dimensional simulations of morphologies at both short and long times.
+We find good qualitative agreement with experimental heuristics, but we conclude that an additional model for the vitrification process will be key for fully explaining experimental observations of microstructure formation.
+  \end{abstract}
+\end{@twocolumnfalse}
+]
+\else
+\begin{abstract}
+  \abstracttext
+\end{abstract}
+\fi
+% PACS
+% \pacs{}
+% }}}
+
+\section{Introduction}
+% {{{
+Non-solvent induced phase separation (NIPS) is a process where a polymer solution is driven into a two-phase region by exchanging a good solvent for a poor one and is widely used in industry~\cite{vandeWitte1996}, nanotechnology~\cite{Sosa2016,Udoh2016} and biological systems~\cite{Parnell2015} for generating micro-structured polymer materials.
+In this manuscript we consider the industrially relevant example of a polymer membrane made by immersion precipitation as a proxy for the generic NIPS process.
+As shown in Figure~\ref{fig-MT_schematic}, immersion precipitation membranes are made by coating a polymer solution onto a flat substrate, followed by immersion into a non-solvent bath.
+After sufficient exchange of solvent and non-solvent, the film separates into polymer-rich and polymer-lean phases.
+Eventually, the increasing polymer concentration of the polymer-rich phase causes the microstructure of the film to arrest in a non-equilibrium state, forming the membrane.
+
+Despite its prevalence, there are many details of immersion precipitation that are not well understood, including the fundamental kinetics of the mass-transfer initiated phase separation process.
+The community's lack of understanding is not a result of negligence; in the late 1980's and early 1990's several researchers developed one-dimensional mass-transport models of solvent and non-solvent diffusion for immersion precipitation membranes~\cite{Reuvers1987,Tsay1990,Cheng1994}.
+However, such models did not include phase separation kinetics---a critical omission---leaving all predictions of the resulting phase separation to be inferred from single phase concentration profiles.
+
+\begin{figure}[tbp]
+  \includegraphics[width=2in]{fig1-MT_schematic}
+  \caption{Schematic of the immersion precipitation process, where nonsolvent/solvent exchange drives a phase separation in a polymer film.}
+  \label{fig-MT_schematic}
+\end{figure}
+
+While largely ignored by these early transport models, the isolated study of the phase separation kinetics of polymer solutions have also been a frequent topic in the literature~\cite{Barton1998, Chen1998a, Aksimentiev2000}.
+Here, in contrast to the immersion precipitation process, the lion's share of attention for these studies has been on phase separation in a binary, isotropic system following a temperature quench.
+Work on anisotropic systems includes research on temperature-driven surface-directed spinodal decomposition where symmetry is broken by the surface~\cite{Jones1991,Ball1990}.
+Additionally, several groups (including us) have recently studied an initially inhomogeneous ternary polymer solution undergoing spinodal decomposition initiated by a temperature quench~\cite{Martys2001, Zhou2006, Tree2017, Cervellere2019}.
+In both of the latter studies, mass transfer between the bath and film phases was present, but solvent/non-solvent exchange did not initiate the phase separation.
+
+Thus while both solvent/non-solvent exchange and phase separation kinetics of the NIPS process in a ternary polymer solution have been previously studied, researchers have examined them as separate phenomena.
+However, the intimate coupling between mass transfer and phase separation is a hallmark of the NIPS process, since solvent/non-solvent exchange drives the phase separation.
+As such, determining how solvent/non-solvent exchange initiates and affects the kinetics of phase separation is critical to understanding NIPS, and remains an important open question.
+
+One of the principal challenges to understanding the NIPS process has been the lack of robust models capable of reaching the relevant length and time scales.
+In a recent paper~\cite{Tree2017}, we addressed this challenge by deriving and validating a model using the two-fluid formalism of de Gennes, Doi and Onuki~\cite{DeGennes1980,Doi1992}.
+Along with the model, we developed an efficient pseudo-spectral method that permits large-scale, long-time simulations of mass transport and phase separation dynamics.
+
+Even with our method, the need to resolve a large non-solvent reservoir presents an additional computational hurdle to modeling solvent/non-solvent exchange in the NIPS process.
+The most computationally efficient way to handle the reservoir is to use time-dependent, non-homogeneous boundary conditions, which are difficult to incorporate into a pseudo-spectral method.
+To overcome this limitation, we have developed a hybrid finite-difference/pseudo-spectral (FD/PS) method to generalize the types of boundary conditions that can be imposed.
+
+With this tool in hand, we use our previously developed multi-fluid model~\cite{Tree2017} to study the simultaneous processes of solvent/non-solvent exchange and spinodal decomposition in an immersion precipitation-like geometry.
+We first review our model and outline the FD/PS method, and we also provide a brief review of several existing theories that are key to understanding our results.
+We then discuss two different regimes of behavior: (i) phase separations that occur on times much less than the diffusion time of the nonsolvent and (ii) phase separations that occur on much larger timescales.
+In both regimes, we examine how the initial concentration of polymer and nonsolvent in the film influences the phase separation kinetics and the morphology.
+Finally, we conclude with a discussion of the relevance of this work for membrane formation.
+% }}}
+
+\section{Model and Methods}
+% {{{
+
+To simulate the NIPS process, we use a multi-fluid model of a ternary polymer solution, which was derived and characterized in a previous publication~\cite{Tree2017}.
+The model consists of diffusion equations for the independent polymer ($p$) and non-solvent ($n$) components, a (vector) momentum equation and an incompressibility constraint,
+\begin{gather}
+  \frac{\partial \phi_{i}}{\partial t} + \bm{v} \cdot \nabla \phi_{i} =
+    \nabla \cdot \left [ \sum_{j}^{p,n} M_{ij} \nabla \mu_{j} \right ] \label{eq:diffusion} \\
+  0 = -\nabla p + \nabla \cdot \left [ \eta (\nabla \bm{v} + \nabla \bm{v}^{T}) \right ] 
+    - \nabla \cdot \bm{\Pi} \label{eq:momentum} \\
+  \nabla \cdot \bm{v} = 0 \label{eq:incompressibility} \textrm{.}
+\end{gather}
+In these equations $\bm{v}$ is the volume averaged velocity, $\phi_{i}$ is the volume fraction of species $i$, $M_{ij}$ is the mobility matrix, $\mu_{i}$ is the chemical potential of species $i$, $p$ is the pressure, $\eta$ is the solution viscosity and $\bm{\Pi}$ is the osmotic stress.
+Because of incompressibility, the solvent ($s$) volume fraction is not an independent quantity and is completely determined by
+\begin{equation}
+\phi_{s} = 1 - \phi_{p} - \phi_{n} \textrm{.}
+\end{equation}
+Notably, Equations~\ref{eq:diffusion}--\ref{eq:incompressibility} do not contain noise terms and thus neglect thermal fluctuations.
+This simplifying assumption makes it impossible to observe barrier-crossing phenomena such as nucleation with the present model.
+
+The chemical potential in Eq.~\ref{eq:diffusion} is given by,
+\begin{equation}
+  \mu_{i} = \frac{k_{B} T}{\textsc{v}_{0}} \Big ( \frac{\partial f_{0}}{\partial \phi_{i}} - \kappa_{i} \nabla^{2} \phi_{i} \Big ) \label{eq:chem_pot}
+\end{equation}
+where 
+\begin{equation}
+f_{0}(\{\phi_{i}\}) = \sum_{i}^{p,n,s} \frac{\phi_{i}}{N_{i}} \ln \phi_{i} + \frac{1}{2} \sum_{i \ne j}^{p,n,s} \chi_{ij} \phi_{i} \phi_{j} \label{eq:homo_free_energy}
+\end{equation}
+is the Flory--Huggins free energy density of a homogeneous polymer solution, $\textsc{v}_{0}$ is the monomer volume, $k_{B}$ is Boltzmann's constant, $T$ is the absolute temperature and $\kappa_{i}$ are gradient coefficients.
+The homogeneous free energy, $f_{0}$, contains parameters characterizing the molecular weight of the components, $N_{i}$, and the pairwise interactions between species, $\chi_{ij}$.
+The mobility coefficients appearing in Eq.~\ref{eq:diffusion} are defined as,
+\begin{subequations}
+\begin{gather}
+  M_{pp} = \frac{\textsc{v}_{0}}{\zeta_{0}} \, \phi_{p} (1-\phi_{p}) \\
+  M_{pn} = M_{np} = - \frac{\textsc{v}_{0}}{\zeta_{0}} \, \phi_{p} \phi_{n} \\
+  M_{nn} = \frac{\textsc{v}_{0}}{\zeta_{0}} \, \phi_{n} (1-\phi_{n}) \label{eq:mobility}
+\end{gather}
+\end{subequations}
+where $\zeta_{0} = \eta_{s} b$ is the monomer friction coefficient with $\eta_{s}$ the solvent viscosity and $b$ the monomer size.
+
+The osmotic stress tensor in Eq.~\ref{eq:momentum} describes the forces driving chemical diffusion and is completely determined by the chemical potential~\cite{Tanaka2000, Doi1992}.
+Its divergence is given by~\cite{Tree2017}
+\begin{equation} \label{eq:div_osmotic_stress}
+\nabla \cdot \bm{\Pi} = \phi_{n} \nabla \mu_{n} + \phi_{p} \nabla \mu_{p} \textrm{.}
+\end{equation}
+Additionally, the volume-fraction dependent viscosity in Eq.~\ref{eq:momentum} is assumed to be consistent with a Rouse model of polymer solutions,
+\begin{equation}
+\eta = \eta_{s} (1 + c \phi_{p} N_{p})
+\end{equation}
+where $c$ is a constant that is set to unity, unless otherwise noted.
+
+The multi-fluid model is solved numerically on CPUs and GPUs using a custom-written CUDA/C++ program~\cite{Tree2017}.
+Time is discretized with a simple Euler scheme where linear terms are treated implicitly, providing needed stability to small-scale modes.
+The semi-implicit Euler scheme is complemented with a variable time-stepping procedure, which dramatically decreases the total run-time by accelerating/decelerating the simulation during periods of slower/faster dynamics.
+Space is discretized using either a pseudo-spectral method or a hybrid finite-difference/pseudo-spectral method as described below.
+
+The NIPS process requires an initial geometry with two regions: a non-solvent bath and a polymer film, as shown in Figure~\ref{fig-schematic}.
+The initial composition of the film consists of a mixture of polymer, solvent and possibly non-solvent, and the initial bath concentration is pure non-solvent.
+The bottom of the film is impermeable, giving a no-flux condition at the film/substrate interface.
+The bath is infinite, which is computationally realized by making the size of the bath $l_{b}$ much larger than the film size, $l_{\txtf}$.
+
+\begin{figure}[tb]
+  \includegraphics[width=3.25in]{fig2-schematic}
+  \caption{(a) A 2D representation of the simulation geometry for a polymer film of thickness $l_{\txtf}$ and bath height $l_{b}$.
+With periodic boundary conditions, one employs an initial condition that is symmetric about the dashed center-line and $l_{b} \gg l_{\txtf}$.
+For non-periodic boundary conditions where the bath composition is known, no such requirements are necessary, but different methods must be used to discretize space.
+ (b) A 1D plot showing example polymer and non-solvent volume fractions in both film and bath domains corresponding to the 2D schematic in panel (a).}
+  \label{fig-schematic}
+\end{figure}
+
+We use two different approaches to model the system geometry given in Figure~\ref{fig-schematic}.
+For one-dimensional simulations we assume that the system is periodic, and use symmetry to enforce a no-flux boundary condition at $x = 0$ and $x = L_{x}/2$.
+The principle advantage of this setup is the straightforward use of pseudo-spectral methods to treat spatial derivatives, which are both simple to program and offer unparalleled accuracy for resolving the narrow interfaces between phases.
+The downside of using pseudo-spectral methods and periodic boundary conditions is the required size of the nonsolvent bath, $l_{b}$, which must be very large to reach the ``infinite bath'' limit.
+Resolving such a large domain wastes valuable computational resources on a mostly homogeneous bath.
+In fact, even with our optimized method, these costs become prohibitively expensive for long simulations as the diffusive boundary layer grows without bound as time proceeds.
+Because of these costs, simulations with an explicit bath are generally limited to one-dimension (1D)---a severe constraint indeed.
+
+To avoid this problem, our second approach is to use explicit boundary conditions at both the film/substrate interface and near the film/bath interface.
+Because non-homogeneous boundary conditions are difficult to implement in a purely pseudo-spectral algorithm, we use a hybrid pseudo-spectral/finite difference (PS/FD) method for the spatial derivatives that more readily accommodates complicated boundary conditions.
+The hybrid scheme, which is described in detail in the Supplemental Information, discretizes spatial derivatives in one dimension (e.g.~$x$) by finite differences, and the remaining dimensions (e.g.\ $y$ and $z$) pseudo-spectrally.
+The dimension discretized by finite differences acquires the flexibility to represent time-dependent, non-homogeneous boundary conditions, while the other dimensions retain the accuracy properties and efficiency inherent to PS methods.
+Additionally, since only one dimension is represented by FD, the numerical method retains its nearly ideal O$(\mathcal{M} \log \mathcal{M})$ scaling where $\mathcal{M}$ is the total number of points in the collocation and finite difference grids.
+
+With this additional capability, we are able to simulate the NIPS process in 2D and 3D.
+Practically, this is accomplished by first running a 1D simulation with $l_{b} \gg l_{\txtf}$ to calculate the time-dependent concentration profile of the bath.
+In a subsequent multi-dimensional simulation, the length of the bath is truncated and time-varying species concentrations and first derivatives obtained from the 1D simulation are prescribed at the bath interface and the wall.
+(Note that when hydrodynamics are included, the size of the new bath must still be large enough to account for near-interface velocities in the bath.)
+% }}}
+
+\section{Summary of Theory}
+% {{{
+Before discussing the results of our simulation study, it is necessary to provide some context by summarizing a few relevant theories.
+To simplify Equations~\ref{eq:diffusion}--\ref{eq:incompressibility} for analysis, we assume a one-dimensional geometry, pseudo-binary parameters: $\chi_{ps} = \chi_{ns} = 0$, $N_{n} = N_{s} = 1$, $N_{p} = N$ and equal gradient coefficients $\kappa = \kappa_{p} = \kappa_{n}$.
+By simplifying to one dimension we also implicitly assume quiescent conditions (i.e.\ $\bm{v} = 0$), eliminating the momentum and incompressibility equations.
+Using these assumptions, we substitute the chemical potential from Eq.~\ref{eq:chem_pot} into the diffusion equation in Eq.~\ref{eq:diffusion} and use the chain rule to obtain,
+\begin{equation} \label{eq:1D_diffusion}
+\frac{\partial \phi_{i}}{\partial t} =  \frac{\partial}{\partial x} \left [ \sum_{j}^{p,n} \left ( D_{ij} \frac{\partial \phi_{j}}{\partial x} - B_{ij} \frac{\partial^{3} \phi_{j}}{\partial x^{3}} \right ) \right ]
+\end{equation}
+where 
+\begin{subequations} \label{eq:Dmatrix}
+\begin{eqnarray}
+D_{pp} = D_{0} \left [ \frac{1-\phi_{p}}{N} + \phi_{p} - \phi_{n} \phi_{p} \chi_{pn} \right ] \label{eq:Dpp} \\
+D_{pn} = D_{0}  \left [ \phi_{p} (1-\phi_{p}) \chi_{pn} \right ] \label{eq:Dpn} \\
+D_{np} = D_{0} \left [ \phi_{n} (1-\phi_{n}) \chi_{pn} \right ] \label{eq:Dnp} \\
+D_{nn} = D_{0} \left [ 1 - \phi_{n} \phi_{p} \chi_{pn} \right ] \label{eq:Dnn}
+\end{eqnarray}
+\end{subequations}
+are the components of the Fickian diffusion matrix, 
+\begin{subequations} \label{eq:Bmatrix}
+\begin{eqnarray}
+B_{pp} = D_{0} \kappa \left [\phi_{p} (1-\phi_{p}) \right ] \label{eq:Bpp} \\
+B_{pn} = - D_{0} \kappa \left [\phi_{p} \phi_{n} \right ] \label{eq:Bpn} \\
+B_{np} = - D_{0} \kappa \left [\phi_{p} \phi_{n} \right ] \label{eq:Bnp} \\
+B_{nn} = D_{0} \kappa \left [\phi_{n} (1-\phi_{n}) \right ] \label{eq:Bnn}
+\end{eqnarray}
+\end{subequations}
+are the components of the gradient coefficient matrix and $D_{0} = k_{B} T/\zeta_{0}$ is the monomer diffusion coefficient.
+
+The thin-film geometry is formally described by initial and boundary conditions that supplement Equations~\ref{eq:1D_diffusion}--\ref{eq:Bmatrix}.
+We take the initial condition for each species to be a scaled step-function,
+\begin{equation} \label{eq:ic}
+\phi_{i}(x, t=0) = (\phi_{i}^{\txtb} - \phi_{i}^{\txtf}) \theta(x) + \phi_{i}^{\txtf}
+\end{equation}
+where $\theta(x)$ is the step function, $\phi_{i}^{\txtb}$ are the initial volume fractions in the bath and $\phi_{i}^{\txtf}$ are the initial volume fractions in the thin film.
+Due to the fourth-order gradient, the semi-infinite geometry includes two boundary conditions at a (substrate) wall at $x = -l_{\txtf}$ and two at $x \rightarrow \infty$. 
+At the wall, we have a mass-conserving, no-flux condition
+\begin{equation}
+\sum_{j} M_{ij} \left . \frac{d \mu_{j}}{d x} \right |_{x = -l_{\txtf}} = 0
+\end{equation}
+and a condition imposing thermodynamic equilibrium at the surface
+\begin{equation}
+\left . \frac{d f_{w}}{d \phi_{i}} + \kappa \frac{d \phi_{i}}{d x} \right |_{x=-l_{\txtf}} = 0 \textrm{.}
+\end{equation}
+In the latter boundary condition, $f_{w}$ is the surface free energy density~\cite{Schmidt1985,Hur2012} given by
+\begin{equation}
+f_w = \chi_{wp} \phi_{p}(x=-l_{\txtf}) + \chi_{wn} \phi_{n}(x=-l_{\txtf})
+\end{equation}
+where $\chi_{wp}$ and $\chi_{wn}$ are effective wall-polymer and wall-nonsolvent interactions, which are assumed zero unless otherwise noted.
+Using this form for $f_{w}$, the second boundary condition becomes a prescription of the local contact angle
+\begin{equation}
+\left . \frac{d \phi_{i}}{d x} \right |_{x = -l_{\txtf}} = -\frac{\chi_{wi}}{\kappa} \textrm{.}
+\end{equation}
+The conditions at infinity are given by
+\begin{gather}
+\lim_{x\rightarrow\infty} \phi_{i} = \phi_{i}^{\txtb} \\
+\lim_{x\rightarrow\infty} \frac{d \phi_{i}}{dx} = 0 \textrm{.}
+\end{gather}
+
+\subsection{The Dilute Limit}
+
+In the case that both the bath and the film are mostly solvent ($\phi_{p}^{b} \ll 1$, $\phi_{n}^{b} \ll 1$ and $\phi_{p}^{f} \ll 1$, $\phi_{n}^{f} \ll 1$), transport occurs far away from the binodal, and no phase separation dynamics are relevant.
+Eq.~\ref{eq:1D_diffusion} then reduces to a set of uncoupled, constant-coefficient diffusion equations,
+\begin{equation}
+\frac{\partial \phi_{i}}{\partial t} = D_{i} \frac{\partial^{2} \phi_{i}}{\partial x^{2}} \label{eq:simple_diffusion}
+\end{equation}
+with the initial condition in Eq.~\ref{eq:ic} and the simplified boundary conditions
+\begin{gather}
+\left . \frac{d \phi_{i}}{d x} \right |_{x=-l_{\txtf}} = 0 \\
+\lim_{x\rightarrow\infty} \phi_{i} = 0
+\end{gather}
+where $D_{p} = \frac{k_{B} T}{\zeta_{0} N}$ and $D_{n} = \frac{k_{B} T}{\zeta_{0}} = D_{0}$.
+Note that this limit is singular, with the fourth order derivative and additional boundary terms disappearing.
+
+Eq.~\ref{eq:simple_diffusion} readily yields an analytical solution,
+\ifdoublecol
+\begin{multline} \label{eq:simple_diffusion_soln}
+\frac{ \phi_{i}(x, t) - \phi_{i}^{\txtb} }{ \phi_{i}^{\txtf} - \phi_{i}^{\txtb} } = \\
+  \frac{1}{2} \left [ \erf \left( \frac{x + 2 l_{\txtf}}{2 \sqrt{D_{i} t}} \right ) - \erf \left( \frac{x}{2\sqrt{D_{i} t}} \right ) \right ] \textrm{.}
+\end{multline}
+\else
+\begin{equation} \label{eq:simple_diffusion_soln}
+\frac{ \phi_{i}(x, t) - \phi_{i}^{\txtb} }{ \phi_{i}^{\txtf} - \phi_{i}^{\txtb} } =
+  \frac{1}{2} \left [ \erf \left( \frac{x + 2 l_{\txtf}}{2 \sqrt{D_{i} t}} \right ) - \erf \left( \frac{x}{2\sqrt{D_{i} t}} \right ) \right ] \textrm{.}
+\end{equation}
+\fi
+It is convenient to introduce a dimensionless variable $\xi_{i} \equiv x/(\sqrt{2 D_{i}t})$ into Eq.~\ref{eq:simple_diffusion_soln}, giving
+\ifdoublecol
+\begin{multline} \label{eq:simple_diffusion_soln_xi}
+\frac{ \phi_{i}(x, t) - \phi_{i}^{\txtb} }{ \phi_{i}^{\txtf} - \phi_{i}^{\txtb} } = \\
+  \frac{1}{2} \left [ \erf \left( \frac{\xi_{i}}{\sqrt{2}} + \frac{l_{\txtf}}{\sqrt{D_{i} t}} \right ) - \erf \left( \frac{\xi_{i}}{\sqrt{2}} \right ) \right ] \textrm{.}
+\end{multline}
+\else
+\begin{equation} \label{eq:simple_diffusion_soln_xi}
+\frac{ \phi_{i}(x, t) - \phi_{i}^{\txtb} }{ \phi_{i}^{\txtf} - \phi_{i}^{\txtb} } =
+  \frac{1}{2} \left [ \erf \left( \frac{\xi_{i}}{\sqrt{2}} + \frac{l_{\txtf}}{\sqrt{D_{i} t}} \right ) - \erf \left( \frac{\xi_{i}}{\sqrt{2}} \right ) \right ] \textrm{.}
+\end{equation}
+\fi
+When the film is thicker than the diffusion length ($l_{\txtf} \gg \sqrt{D_{i}t}$) or the time is shorter than the diffusion time ($t \ll l_{\txtf}^{2}/D_{i}$) the argument of the first error function on the right-hand side of Eq.~\ref{eq:simple_diffusion_soln_xi} approaches infinity, giving the infinite domain solution,
+\begin{equation} \label{eq:simple_diffusion_soln_small_t}
+\lim_{ t D_{i}/l_{\txtf}^{2} \rightarrow 0} \frac{ \phi_{i}(x, t) - \phi_{i}^{\txtb} }{ \phi_{i}^{\txtf} - \phi_{i}^{\txtb} } =
+  \frac{1}{2} \left [ 1 - \erf \left( \frac{\xi_{i}}{\sqrt{2}} \right ) \right ] \textrm{.}
+\end{equation}
+
+There are two important physical consequences in this limit.
+First, the film thickness drops out of the equation entirely, and transport is completely independent of it.
+Second, distance and time collapse with the similarity variable $\xi \sim x/\sqrt{t}$ and when scaled properly, the solution is stationary in a self-similar shape.
+At long times, neither of these properties are guaranteed.
+The film thickness becomes an important length scale and the concentration profile is no longer self-similar.
+
+% Could put a plot here, showing how the concentration profile changes in real space for reference.
+
+\subsection{Asymptotic analysis}
+
+Non-dimensionalizing Eq.~\ref{eq:1D_diffusion} permits an asymptotic analysis that provides some important insights.
+Choosing the length scale $l_{\txtf}$ and time-scale $l_{\txtf}^{2}/D_{0}$ gives,
+\begin{equation} \label{eq:asymptotic_diffusion}
+\frac{\partial \phi_{i}}{\partial \tilde{t}} =  \frac{\partial}{\partial \tilde{x}} \left [ \sum_{j}^{p,n} \left ( \tilde{D}_{ij} \frac{\partial \phi_{j}}{\partial \tilde{x}} - \epsilon^{2} \tilde{B}_{ij} \frac{\partial^{3} \phi_{j}}{\partial \tilde{x}^{3}} \right ) \right ]
+\end{equation}
+where $\tilde{x} = x/l_{\txtf}$, $\tilde{t} = D_{0} t/l_{\txtf}^{2}$, $\tilde{D}_{ij} = D_{ij}/D_{0}$, $\tilde{B}_{ij} = B_{ij}/(D_{0} \kappa)$ and $\epsilon = \sqrt{\kappa}/l_{\txtf}$.
+The dimensionless quantity $\epsilon$ is very small since $\kappa$ is a mesoscale parameter and $l_{\txtf}$ is a macroscopic parameter.
+
+To our knowledge an asymptotic analysis of the multi-component model Eq.~\ref{eq:asymptotic_diffusion} has not been presented in the literature to date. 
+Due to its difficulty, a comprehensive analysis of this singular, multi-scale, multi-region matched asymptotics problem is beyond the scope of the present paper.
+However, a classic paper by Pego~\cite{Pego1989} presents results for the binary Cahn-Hilliard model,
+\begin{equation} \label{eq:CH}
+\frac{\partial \phi}{\partial t} = \nabla^{2} \left [ f_{0}'(\phi) - \epsilon^{2} \nabla^{2} \phi \right ]
+\end{equation}
+in an unbounded domain where $f_{0}'(\phi)$ is an unspecified homogeneous free energy.
+Despite the difference in the number of components and boundary conditions, we expect many qualitative results to be the same between the two models.
+As such, we describe Pego's relevant findings in light of our model.
+
+Pego assumes initial conditions that lead to phase-separation (but are not necessarily at equilibrium) and subsequently divides his analysis into an inner region that encompasses the interface and two outer regions that correspond to our film and bath (cf.\ Figure~\ref{fig-schematic}).
+He identifies four relevant time scales, and we will briefly discuss the behavior in the inner and outer regions at each scale.
+
+The smallest time scale is $\tilde{t} \sim \epsilon^{2}$, which corresponds to $t \sim \kappa/D_{0}$ in dimensional units in our model.
+At this scale, the leading order outer regions (i.e. bath and film) remain unchanged from their initial values, while the inner region (the interface) undergoes rapid equilibration.
+The equilibrium values reached at the interface ($\phi_{i}^{eq,+}$ and $\phi_{i}^{eq,-}$) are due to the local initial condition and are not in general equal to the concentrations in the outer regions ($\phi_{i}^{\txtf}$ and $\phi_{i}^{\txtb}$).
+
+Subsequently, boundary layers form between the equilibrated interface and the outer regions to ``match'' the inner and outer solutions.
+The evolution of the boundary layers occurs on time scales between $\epsilon^{2} \ll \tilde{t} \ll 1$ which corresponds to $ \kappa/D_{0} \ll t \ll l_{\txtf}^{2}/D_{0}$ in dimensional units.
+As expected the size of the boundary layers are proportional to $t^{1/2}$ and the solution for the outer region is described by a similarity solution that collapses with a single variable $\tilde{x}/( 2 \tilde{t}\,)^{1/2}$.
+Note the qualitative similarities between Pego's analysis at this scale and the full solution for the dilute regime described above.
+Both include similarity variables, but the matched asymptotic scheme accounts for a phase separated interface whereas the solution in the dilute regime is complicated by a finite film thickness and two time scales coming from the differing diffusivities of polymer and nonsolvent.
+
+At the time scale $\tilde{t} \sim 1$ or $t \sim l_{\txtf}^{2}/D_{0}$ in dimensional units, diffusive exchange happens across the interface, and the film shrinks or swells.
+Here, the leading order terms in the phase field model are equivalent to a classic Stefan problem~\cite{Pego1989, Tarzia2000}, where the inner solution is in local equilibrium and the boundary layers in the outer solution are large compared to $l_{\txtf}$.
+In the classic formulation of the Stefan problem, sustained diffusive exchange is driven by boundary conditions, but in our case the semi-infinite nonsolvent bath serves the same purpose.
+Finally, at this time scale Pego predicts an interface velocity that is proportional to the difference in the chemical potential gradient across the interface (i.e.\ the mass flux), and ultimately approaches zero when $\tilde{t} \gg 1$.
+
+The fourth and largest time scale in the asymptotic expansion is $\tilde{t} \sim 1/\epsilon$ or $t \sim l_{\txtf}^{3}/(D_{0} \kappa^{1/2})$ in dimensional units. 
+At this scale both the inner and outer solutions are in quasi-equilibrium, and the interface moves due to chemical potential gradients arising from interface curvature.
+This phenomena is perhaps most familiar in the Ostwald ripening/coarsening process that occurs in mixtures of immiscible liquids.
+We expect that this final time scale will be of lesser import at the bath/film interface than the previous three. 
+However, Ostwald ripening can certainly occur inside precipitating films following phase separation.
+
+\subsection{Surface-directed spinodal decomposition}
+
+Finally, we briefly highlight the theory of surface-directed spinodal decomposition and its application to the current system.
+In the bulk, spinodal decomposition driven by a temperature quench proceeds isotropically, and a linear stability analysis may be used to obtain the fastest growing domain size immediately following phase separation~\cite{Tree2017}.
+However, when symmetry is broken by a surface, spinodal decomposition is no longer isotropic and proceeds via a wave traveling from the interface into the bulk of the film~\cite{Marko1993,Ball1990}.
+Ball and Essery showed that this traveling spinodal wave occurs when either (i) the bulk temperature is \emph{below} the spinodal temperature $T_{s}$ and there is a surface energy, or (ii) the bulk temperature is \emph{above} the spinodal temperature $T_{s}$ and the surface temperature is suddenly dropped below $T_{s}$~\cite{Ball1990}.
+
+Examining the perturbations about a homogeneous state in a semi-infinite domain, Ball and Essery~\cite{Ball1990} derived an expression for a traveling wave solution of a binary Cahn-Hilliard fluid quenched at the surface into the spinodal region.
+However, as was the case with the asymptotic analysis by Pego in the previous section, we are not aware of parallel calculations for a ternary Flory-Huggins phase-field model, i.e.\ Eq.~\ref{eq:1D_diffusion} with appropriate initial and boundary conditions.
+Nevertheless, while some quantitative details may differ, we expect that a traveling wave solution in the Flory-Huggins model will be qualitatively identical to that of the Cahn-Hilliard model.
+More quantitative details related to surface-directed spinodal decomposition can be found in the Supplemental Information.
+% }}}
+
+\section{Results and Discussion}
+% {{{
+Pego's asymptotic analysis and the dilute solution theory outlined above suggest an important division at the timescale $\tau = l_{\txtf}^{2}/D_{0}$, the characteristic time it takes the non-solvent to diffuse to the bottom of the film.
+Theory suggests that at times much less than $\tau$, the behavior at or near the interface dominates, and since these are largely determined by the initial conditions, the film thickness is inconsequential.
+By contrast, at times much larger than $\tau$, solvent/nonsolvent exchange drives a change in the film concentration, with the film thickness playing an important role.
+
+To test this hypothesis, we performed a series of one-dimensional simulations where we varied the film thickness ($l_{\txtf} = 51.2$, $102.4$, $204.8$ in units of the polymer end-to-end distance, $R_{0}$) and degree of polymerization ($N_{p}=10$, $20$, $50$) and examined the non-solvent concentration at the bottom of the film (i.e. the wall).
+All simulations were performed in 1D with Flory-Huggins parameters given by: $\chi = 1.213$, $\kappa = 3.369$ (for $N_{p}=10$), $\chi = 1.048$, $\kappa = 2$ (for $N_{p}=20$), and $\chi = 0.9120$, $\kappa = 12.67$ (for $N_{p}=50$).
+The initial bath concentration is essentially pure nonsolvent: $\phi_{p}^{\txtb} = 0.01$, $\phi_{n}^{\txtb} = 0.98$ (where a finite solvent and polymer concentration are required for numerical stability), and the initial film concentration was chosen far enough away from the phase envelope that the film does not immediately precipitate: $\phi_{p}^{\txtf} = 0.204$, $\phi_{n}^{\txtf} = 0.301$.
+
+\begin{figure}[t]
+  \includegraphics[width=3.25in]{fig3-wall_concentration}
+    \caption{
+Nonsolvent concentration at the wall versus time for three different values of the film thickness: $l_{\txtf} = 51.2$ (solid), $102.4$ (dashed), $204.8$ (dot-dashed) and three different degrees of polymerization: $N_{p} = 10$ (blue), $20$ (orange), $50$ (green).
+(a) Concentration versus raw simulation time-units (the Rouse time of the polymer)~\cite{Tree2017}.
+(b) Concentration versus time scaled by the diffusion time, $\tau$.
+}
+  \label{fig-wall_concentration}
+\end{figure}
+
+The results of these simulations presented in Figure~\ref{fig-wall_concentration}(a), show that the nonsolvent concentration at the wall remains unchanged for some delay period and then begins to increase monotonically.
+Figure~\ref{fig-wall_concentration}(b) shows the same data rescaled by the diffusion time.
+In the latter, all of the data collapse to a single curve, illustrating that the diffusion time is indeed the timescale governing the transition thereby confirming the qualitative results of the dilute solution theory.
+
+Having confirmed that the transport behavior differs based on the timescale $\tau$, we break our remaining analysis into two parts.
+In the section that immediately follows, we examine early-time behavior ($t \ll \tau$), specifically focusing on films that precipitate on this timescale.
+Subsequently, we turn our attention to late-time behavior ($t \gg \tau$) and the characteristics of mass-transport driven phase separation in that regime.
+% }}}
+
+\subsection{Early-Time Regime}
+% {{{
+A key theoretical prediction in the early-time regime is an insensitivity of the mass-transport behavior to the film thickness.
+In fact, Pego predicts that the concentration profile in this time regime, $\kappa/D_{0} \ll t \ll l_{\txtf}^{2}/D_{0}$, will be self-similar.
+
+We verify that the concentration profiles in our simulations are indeed self-similar at early times in Figure~\ref{fig-self_similarity}.
+As discussed previously, we perform a series of one-dimensional simulations where we vary the film thickness, but in this case we examine the entire volume fraction profile at early times before the nonsolvent boundary layer can reach the bottom of the film.
+In Figure~\ref{fig-self_similarity} we show results for three simulations where $N_{p} = 20$, $\kappa = 2$, $\chi_{pn} = 1.048$, $\phi_{p}^{\txtf} = 0.301$, $\phi_{n}^{\txtf} = 0.01$, $\phi_{p}^{\txtb} = 0.01$, $\phi_{n}^{\txtb} = 0.98$ and $l_{\txtf} = 51.2$, $102.4$, and $204.8$ at $t = 2.5$, $10$, and $40$ respectively.
+Panel (a) shows the unscaled data, zoomed in near the interface, and panel (b) shows the same data that now collapses when rescaled by the similarity variable $\xi = \xi_{0} = x/\sqrt{2 D_{0} t}$.
+
+Figure~\ref{fig-self_similarity}(c) shows the same three profiles as panels (a) and (b) plotted in composition space alongside the ternary phase diagram.
+Such a plot has historically been called a ``composition path''~\cite{Reuvers1987,Tsay1990}, and as is evident in the figure, this path is insensitive to the film thickness at early times.%
+\footnote{
+Originally, the term ``composition'' path referred only to the early-time composition, where, because of similarity, one could interpret the curve as simultaneously representing both spatial and temporal film compositions.
+However, the term has been used much more broadly as simply the volume fraction profile plotted in composition space with real space being implicit.
+We use the term in this latter sense.
+}
+Additionally, the composition path is stationary in time for $t \ll l_{\txtf}^{2}/D_{0}$, i.e.\ as long as the nonsolvent boundary layer has not yet reached the bottom of the film.
+
+\begin{figure}[tbp]
+  %\includegraphics[width=3.25in]{fig-self_similarity}
+  \includegraphics[width=3in]{fig4-self_similarity}
+    \caption{
+Early-time nonsolvent concentration for a 1D simulation with different film thicknesses as a function of (a) space, (b) similarity variable and (c) composition.
+Both the similarity variable and composition-space plot collapse the data.
+}
+  \label{fig-self_similarity}
+\end{figure}
+
+The properties of thickness independence and stationarity narrow the range of possible behaviors of early-time composition paths, but they remain very sensitive to the initial film concentration.
+To examine this behavior, we performed one-dimensional simulations while varying the initial film concentration and holding the bath concentration constant at nearly pure nonsolvent ($\phi_{p}^{\txtb} = 0.01$, $\phi_{n}^{\txtb} = 0.98$).
+All of the relevant 1D simulations for this study were performed with $N_{p} = 20$, $\kappa = 2$ and $\chi_{pn} = 1.048$.
+
+We observe three regimes of behavior depending on the location of the initial film concentration in composition space.
+Figure~\ref{fig-inf_domain}(a) shows a representative simulation in each of the regimes and Fig.~\ref{fig-inf_domain}(b) categorizes the behavior of a sweep of initial film compositions in composition space alongside the ternary phase diagram.
+In regime I the composition path does not cross into the two phase region, so no phase separation occurs and the interface remains diffuse.
+In regime II the composition path crosses into the two phase region, resulting in a phase separation into two domains, a polymer-rich film and polymer-lean bath, with boundary layers at the edge of each interface.
+Regimes I and II are not very interesting at early times, however, as we discuss in the next section, they can both lead to a delayed precipitation at later times.
+
+\begin{figure}[tbp]
+  %\includegraphics[width=3.25in]{fig-inf_domain}
+  \includegraphics[width=3in]{fig5-inf_domain}
+    \caption{(a) Representative composition paths of three different regimes of behavior plotted in composition space alongside the phase diagram.
+Regime I (red dashed line) shows no phase separation between bath and film, Regime II (green dot-dashed line) shows a sharp interface between the bath and film and Regime III (blue solid line) shows an immediate spinodal decomposition of the film.
+(b) Phase plot of initial film concentrations which give rise to each regime: I (red), II (green), III (blue).
+}
+  \label{fig-inf_domain}
+\end{figure}
+
+By contrast, regime III is a more interesting example of non-equilibrium phase behavior;
+films prepared with initial conditions in this regime are stable when isolated at equilibrium, but are unstable immediately following contact with the nonsolvent bath.
+Here, the composition path plunges directly into the spinodal, the phase separation kinetics break stationarity and waves of spinodal decomposition propagate into the film as time progresses.
+In fact, regime III appears to be the mass-transfer analogue of classic temperature-driven surface-directed spinodal decomposition~\cite{Ball1990}.
+
+\begin{figure}[t]
+  %\includegraphics[width=3.25in]{fig-prediction}
+  \includegraphics[width=3in]{fig6-prediction}
+  \caption{(a) Comparison between composition paths from simulation (regime I: dark red dashed line, regime II: dark green dot-dashed line) and from dilute solution theory (regime I: light red dashed line, regime II: light green dot-dashed line).
+(b) Comparison between regimes I (red circles, no phase separation), II (green circles, phase separation) and III  (blue circles, surface-directed spinodal decomposition) determined from simulation data and the location of the midpoint of the interface of the initial condition. 
+Initial compositions where the midpoint of the interface falls within the spinodal are shaded blue and those that fall outside the spinodal are shaded red.
+}
+  \label{fig-prediction}
+\end{figure}
+
+% Basic theory of why?
+It is insightful to compare the results of our 1D simulations with some of the theoretical predictions outlined above.
+Figure~\ref{fig-prediction}(a) compares the composition paths from our 1D simulations for regimes I and II with the ``dilute-limit'' prediction.
+As one might expect, the dilute-limit theory does poorly for regime II where phase separation occurs and fails completely for regime III.
+However, even regime I with a relatively dilute initial polymer concentration in the film is not well described by the theory.
+
+Repeated tests with equations of the form of Eq.~\ref{eq:simple_diffusion_soln_small_t} show that the length of the ``tails'' of the composition path are determined by the relative diffusivity of the polymer and nonsolvent.
+A relatively slow polymer diffusion coefficient gives longer tails parallel to the polymer composition line, whereas equal diffusion coefficients gives a straight-line composition path between the film and bath with no tails.
+Additional testing reveals that the location of midpoint of the composition path, i.e.\ the red and green square in Figure~\ref{fig-prediction}(a), is fixed regardless of the diffusivity.
+From these tests we conclude that a concentration-dependent diffusivity is critical to predicting the early-time composition path regardless of whether or not the film phase separates initially.
+
+It would also be desirable to have an easy way to predict the regime of behavior from the initial condition without having to run a full simulation.
+Based on Pego's analysis, we expect that the early-time phase separation behavior will be determined by the local initial concentration near the interface.
+Accordingly, we hypothesize that if the midpoint of the interface of the initial condition, i.e.\ the average of the initial bath and film concentrations, is within the spinodal, we will observe phase separation.
+Recall that we have neglected thermal fluctuations in our model, so an interface inside the binodal but outside the spinodal would not be able to cross the nucleation barrier to show a phase separation.
+
+Figure~\ref{fig-prediction}(b) compares this simple prediction with the full simulation results.
+As in Figure~\ref{fig-inf_domain}(b), the initial conditions which give rise to the three different regimes are marked by different colored points and the prediction is marked by background shading.
+The interface-midpoint prediction is centered in roughly the right place in composition space, but does not accurately predict the curvature of the border between the two regions.
+However, considering the crudeness of the prediction, the correspondence with the full calculation is surprisingly close.
+
+Unfortunately, we do not have a simple metric for distinguishing between regimes II and III.
+The upper left tail of the composition path represents the concentration on the film side of the interface, and repeated observations of simulation data suggests that one observes regime III when this tail crosses into the spinodal region.
+By contrast, one observes regime II when a different part of the composition path enters the spinodal.
+Because polymer diffusion is slow, and the composition path is nearly parallel to lines of constant polymer composition, regime III tends to occur to initial conditions that are located north-northwest of the spinodal and regime II typically appears due west.
+Regrettably, these insights are qualitative and difficult to use to make a simple quantitative prediction.
+
+One can gain additional insight into the kinetic regimes by examining the effects of model parameters, which is explored in detail in the Supplemental Information.
+Figure~\ref{SI:fig-param_study} categorizes the kinetic regimes of several different data sets by their initial condition by systematically varying $N_{p}$, $\chi_{pn}$ and $\chi_{ns}$.
+Upon varying these parameters, we find results consistent with our qualitative interpretations discussed above. 
+Specifically, the data support our conclusions that the initial local concentration of the interface is primarily responsible for distinguishing regime I from regime II and that the entrance of the film-side ``tail'' of the composition path into the spinodal is responsible for a film that undergoes spinodal decomposition.
+
+%% Need to embellish this part a bit.
+%% Compare to SDSD to justify having the theory? Or take the SDSD theory out from above?
+Finally, we are able to perform 2D and 3D simulations to examine the microstructure and hydrodynamics of regime III.
+We recently reported unique hydrodynamic behavior of regime III in another publication, including an examination of the possibility that a Marangoni instability that could be responsible for macrovoid formation~\cite{Tree2018}.
+Here, we focus on the microstructural evolution absent hydrodynamics.
+
+\begin{figure*}[tbp]
+  \includegraphics[width=6.5in]{fig7-early_time_morphology}
+  \caption{(a) The part of the composition space exhibiting regime III colored by the observed microstructure in 2D simulations: 
+non-solvent droplets in a polymer matrix (blue), alternating bands of polymer and nonsolvent (purple) and polymer droplets in nonsolvent (blue-green).
+2D contour plots ($256 R_{0} \times 256 R_{0}$) and 3D density plots ($64 R_{0} \times 64 R_{0} \times 32 R_{0}$) of the polymer concentration showing microstructure: (b) nonsolvent droplets, (c) alternating bands and (d) polymer droplets.
+The color bar on the right of (d) indicates polymer concentration and is valid for both 2D and 3D plots.
+}
+  \label{fig-early_time_morphology}
+\end{figure*}
+
+Figure~\ref{fig-early_time_morphology} shows results from 2D and 3D simulations, with exactly the same parameters and initial conditions as the 1D simulations shown in Figure~\ref{fig-inf_domain}.
+As is the case in 1D simulations, the phase separation starts at the top of the film and proceeds as a travelling wave into the bulk.
+Initial conditions with a larger solvent concentration result in a shallower quench with larger domain sizes and broader interfaces, whereas quenches nearer the spinodal line are deeper with smaller domain sizes and sharper interfaces.
+
+The characteristics of the morphology that develops depends on the polymer concentration of the film, following a qualitatively similar pattern to isotropic spinodal decomposition.
+At high polymer concentration, we observe nonsolvent-rich droplets in a polymer matrix, and at low polymer concentration we observe the inverse morphology: polymer-rich droplets form in a nonsolvent solution.
+The center of the region gives alternating bands of polymer and nonsolvent.
+Because our simulations neglect thermal fluctuations, it is necessary to add random noise to the initial conditions to observe droplets. 
+Subsequently, the exact crossover between different microstructures is sensitive to the strength of the applied noise.
+Also, note that the morphology is a function of time; immediately following phase separation, coarsening processes cause domain coalescence and growth.
+
+Though the sequence is qualitatively similar, the morphologies in Figure~\ref{fig-early_time_morphology} are not identical to isotropic spinodal decomposition.
+In lieu of random isotropic droplets patterns or a bicontinuous morphology, the travelling spinodal wave gives hexagonally ordered droplets~\cite{Paradiso2016} and striped domains.
+We suspect however, that some or all of this order will disappear for systems with thermal fluctuations.
+Additionally, diffusion leads to an inhomogeneous concentration at the top of the film, often giving an enhanced polymer concentration at the interface. 
+In many cases, this leads to a thin polymer-rich region at the top of the film, even at low overall polymer concentration.
+Nevertheless, sometimes this thin domain is transient and breaks up as the phase separation proceeds.
+
+Finally, there are some differences between the 2D and 3D morphologies.
+In Fig.~\ref{fig-early_time_morphology}(b) 2D simulations show nonsolvent droplets in a polymer matrix, whereas 3D simulations show thick bands.
+Based on our experience, we attribute this disparity to either the relatively small size of the 3D simulation box or to a difference in the impact of the initial noise strength on 2D versus 3D simulations.
+Future work with larger simulation boxes and with models that include thermal fluctuations will therefore be necessary to provide greater insight.
+Fig.~\ref{fig-early_time_morphology}(d) also shows a difference in morphology; 2D simulations show polymer droplets, whereas the 3D simulations show connected, elongated polymer domains.
+Notably, the 3D simulations show a banded structure, but no hexagonal ordering.
+This difference is clearly a consequence of dimensionality and suggests that we might expect to find isolated polymer droplets at yet lower polymer concentrations.
+Unfortunately, we did not observe this morphology in our limited set of 3D simulations.
+% }}}
+
+\subsection{Late-Time Regime}
+% {{{
+At times $t \gg l_{\txtf}^{2}/D_{0}$ the concentration at the bottom of the film changes, meaning the concentration profiles are no longer self-similar and the composition paths are no longer stationary.
+A typical case of the time evolution of the composition profile is given in Figure~\ref{fig-time_invariance}.
+Here, we present long-time simulations with the same thermodynamic and kinetic parameters and initial compositions as the short-time data in Figure~\ref{fig-self_similarity}, i.e.\ $N_{p} = 20$, $\chi_{pn} = 1.048$, $\kappa = 2$ with $\phi_{p}^{\txtf} = 0.3$, $\phi_{n}^{\txtf} = 0.01$,  $\phi_{p}^{\txtb} = 0.01$ and $\phi_{n}^{\txtb} = 0.98$.
+Figure~\ref{fig-time_invariance}(a) shows the volume fraction of the nonsolvent versus the similarity variable at four different time-points, and Figure~\ref{fig-time_invariance}(b) show the same data plotted in composition space alongside the ternary phase diagram.
+
+The data in Figure~\ref{fig-time_invariance} shows an invariance to the film thickness that is worth noting.
+Simulations for both $l_{\txtf} = 102.4$ and $l_{\txtf} = 51.2$ show equivalent behavior in both real and composition space when the time is chosen such that $t_{1}/t_{2} = \left ( l_{\txtf, 1}/l_{\txtf,2} \right )^{2}$.
+This invariance and choice of $t$ can be understood by recalling Eq.~\ref{eq:simple_diffusion_soln_xi}, a result of our dilute solution theory.
+In the theory, late-time diffusion is governed by two variables, either the dimensional quantities $x$ and $t$ or the dimensionless groups, $\xi$ and $t D_{0}/l_{\txtf}^{2}$.
+This result is especially useful, because in many cases it removes film thickness as an independent variable that needs to be accounted for in the simulations.
+Notably, when other kinetic processes such as spinodal decomposition are present, additional time scales may be relevant and the dimensional analysis discussed above is incomplete.
+However, we show in Figure~\ref{SI:fig-time_invar_spinodal} in the Supplemental Information, that this is a minor issue and that the nonsolvent/solvent transport remains largely the same, independent of whether or not spinodal decomposition takes place.
+
+\begin{figure}[tbp]
+  \includegraphics[width=3.25in]{fig8-time_invariance}
+    \caption{%
+(a) Real-space and (b) composition-space volume fraction profiles of long-time, 1D simulations of solvent-nonsolvent exchange.
+The solid curves show a film thickess of $l_{\txtf} = 102.4$ at time points (i) 10, (ii) 500, (iii) $2\times10^{3}$, and (iv) $5\times10^{3}$ (in units of the Rouse time).
+The closed circles show a film thickness of $l_{\txtf} = 51.2$ at time points (i) 2.5, (ii) 125, (iii) 500, and (iv) $1.25\times10^{3}$.
+}
+  \label{fig-time_invariance}
+\end{figure}
+
+We observe several stages of behavior in the concentration profiles in Figure~\ref{fig-time_invariance}.
+Stage (i) is the early-time profile discussed above (c.f.\ Figure~\ref{fig-self_similarity}). 
+These initial conditions provide an example of the previously discussed early-time regime I, where no immediate phase separation occurs.
+Stage (ii) occurs when a portion of the concentration profile crosses the plait point into the two-phase region.
+This transition point marks the beginning of phase separation, and a true interface develops between the bath and the film where the interface composition is determined by a local equilibrium.
+
+Stage (iii) is characterized by mature phase separation between the bath and film and an inhomogeneous concentration profile in the polymer film.
+As solvent-nonsolvent exchange proceeds, the concentration of the interface follows the binodal curve, deepening the quench.
+As seen by the marker denoting the bottom of the film, the composition of the rest of the film trails the composition of the interface, giving an enhanced polymer concentration and depleted non-solvent concentration at the interface relative to the bulk of the film.
+Eventually, in stage (iv) the time scales are large enough for diffusion to create a nearly homogeneous film whose concentration is again determined by a local equilibrium condition.
+
+To get a sense of the time scales, notice the logarithmic spacing between the time points of the various stages.
+Phase separation occurs relatively quickly following the early-time regime, but diffusion across a stable interface appears to take place over an order of magnitude larger time scale.
+Similarly, it takes another order of magnitude for the film to become homogeneous.
+Accordingly, we expect that solvent-nonsolvent exchange will eventually terminate as the system equilibrates, but it would take a remarkably long simulation to observe.
+
+As is the case with the early-time results, the system dynamics at later times depend strongly on the location of the initial condition in composition space. 
+Previously, we observed three different regimes of qualitative behavior: (I) no phase separation, (II) simple phase separation  characterized by a single interface between the bath and film and (III) spinodal decomposition of the film.
+Now we observe these same three regimes again, but transitions can occur between the early-time regime and the late-time regime as solvent/nonsolvent exchange progresses.
+
+\begin{figure}[tbp]
+  \includegraphics[width=3.25in]{fig9-late_time_regimes}
+  \caption{%
+Characterization of the late-time phase separation behavior according to the initial film composition.
+Red circles indicate no phase separation (regime I).
+Green circles indicate simple phase separation (regime II), where the shade of green denotes the delay time before the onset of phase separation.
+Blue circles indicate spinodal decomposition (regime III), where the shade of blue denotes the delay time.
+As indicated, some film compositions in the middle of the phase diagram transition between regimes II and III.
+}
+  \label{fig-late_time_regimes}
+\end{figure}
+
+Figure~\ref{fig-late_time_regimes} shows results for a series of long-time, 1D simulations with $N_{p} = 20$, $\chi_{pn} = 1.048$ and $\kappa = 2$.
+Markers are placed at each initial film composition where a simulation was run, and as before, the color of the marker indicates qualitative behavior at late times.
+Red markers denote initial compositions which result in regime I behavior (no phase separation), green markers denote regime II (simple phase separation) and blue markers denote regime III (spinodal decomposition).
+Additionally, as demonstrated in Figure~\ref{fig-time_invariance}, solvent/nonsolvent exchange can result in a composition path that transitions from one regime at early times to another at late times.
+Figure~\ref{fig-late_time_regimes} characterizes these transitions with a delay time, i.e.\ the simulation time that passes before a regime is observed.
+The delay time is shown in the figure via shading, with darker colors indicating a longer delay.
+
+The kinetic behavior summarized in Figure~\ref{fig-late_time_regimes} is relatively complex, and we find seven qualitatively different scenarios that a composition path can take.
+\begin{enumerate}
+\item \emph{Early-time regime I to late-time regime I}.
+This scenario occurs for all of the red circles on the far right-hand side of the phase diagram.
+Here, the polymer concentration is too low for any phase separation to occur, even at long times.
+
+\item \emph{Early-time regime II to late-time regime II}.
+This scenario occurs for all of the white circles outlined in green (i.e. zero delay time) on the lower left-hand side of the phase diagram.
+This is the opposite case of scenario 1; the polymer is so concentrated that spinodal decomposition of the film is impossible.
+
+\item \emph{Early-time regime III}.
+This scenario occurs for the white circles outline in blue (i.e. zero delay time) near the critical point that undergo immediate spinodal decomposition.
+
+\item \emph{Early-time regime I to late-time regime II}.
+This scenario occurs for the green circles with a finite delay time.
+Here the polymer concentration is just low enough that solvent/nonsolvent exchange can drive a film that is not initially phase separated to form a sharp interface with the bath, but the polymer concentration is too large for the film to enter the spinodal.
+
+\item \emph{Early-time regime I to late-time regime III}.
+This scenario occurs for the blue circles with a finite delay time.
+Solvent/nonsolvent exchange drives these composition paths directly into the spinodal after a delay time that increases as the solvent concentration increases at constant polymer concentration.
+
+\item \emph{Early-time regime II to late-time regime III}.
+This scenario occurs for the small white circles outlined in green with no delay time surrounded by larger, darker blue circles with a finite delay time.
+These initial film compositions are close enough to the spinodal that solvent/nonsolvent exchange can drive the film into the spinodal region.
+However, a modest increase of the solvent concentration at constant polymer composition results in scenarios 2 and 3.
+
+\item \emph{Early-time regime I to late-time regime II to late-time regime III}.
+This is the most complicated scenario, and occurs for the small green circles with a finite delay time surrounded by larger, darker blue circles.
+Here the composition path progresses through all three regimes, with no early-time phase separation, but undergoing both a simple phase separation at the interface and later a delayed spinodal decomposition as time progresses.
+Again, note that the delay time increases as the solvent concentration increases at fixed polymer concentration.
+\end{enumerate}
+
+It is clear from Figure~\ref{fig-late_time_regimes} that the initial polymer concentration is remarkably predictive of the qualitative dynamics of the mass transfer driven phase separation at late times.
+We desire to understand why this is so, and if possible, we would also like heuristics about what distinguishes the different late-time kinetic regimes on the phase diagram.
+We again turn to the dilute-limit, simple diffusion model outlined in the theory section above.
+By setting $x = -l_{\txtf}$, the location of the wall, in the long-time solution in Eq.~\ref{eq:simple_diffusion_soln_xi}, we obtain a prediction for the concentration at the wall as a function of time
+\begin{equation} \label{eq:phi_film_predict}
+\phi_{i}^{\mathrm{wall}}(t) = \phi_{i}^{\txtb} + (\phi_{i}^{\txtf} - \phi_{i}^{\txtb}) \erf \left ( \frac{l_{\txtf}}{2 \sqrt{D_{i} t}} \right ) \textrm{.}
+\end{equation}
+
+Figure~\ref{fig-long_time_pred}(a) shows the results of this prediction for an initial film concentration of $\phi_{p}^{\txtf} = 0.3$, $\phi_{n}^{\txtf} = 0.01$ with $N_{p} = 20$, $\chi_{pn} = 1.048$ and $\kappa = 2$ (an example of scenario 4) alongside the results of $\phi_{i}^{\mathrm{wall}}(t)$ directly from a 1D simulation.
+The dilute solution model shows diffusion into the spinodal via a path that is very nearly parallel to a line of constant polymer concentration, which is a consequence of the relatively slow polymer diffusivity.
+By contrast, the simulation data shows a gradual \emph{increase} in the polymer concentration at the bottom of the film as solvent/nonsolvent exchange proceeds, followed by a sudden increase in polymer concentration as it approaches the binodal.
+We hypothesize that the gradual increase is due to film shrinkage as excess solvent leaves the film, and the sudden increase is driven by a phase separation at the interface.
+We conclude therefore that our simple model can only reproduce phenomena due to the relative diffusivity (as expected), but cannot account for either a changing film thickness, nor the phase separation behavior.
+
+\begin{figure}[tbp]
+  \includegraphics[width=3.1in]{fig10-long_time_pred}
+  \caption{
+(a) Concentration of the bottom of the polymer film as obtained by Eq.~\ref{eq:phi_film_predict} (dashed blue line) and by a 1D simulation of the phase field model (green solid line).
+Note that this plot shows the wall concentration as a function of time, and does not show a ``composition path.''
+(b) Diagram of the infinite delay-time regime (I: red, II: green, III: blue) predicted by Eq.~\ref{eq:phi_film_predict} (background shading) and by 1D simulation (dots).
+}
+  \label{fig-long_time_pred}
+\end{figure}
+
+Despite these differences, it is still insightful to compare a prediction of the location of the late-time regimes from the simple dilute-solution model with those from the full model.
+Accordingly, Figure~\ref{fig-long_time_pred}(b) compares a prediction of the infinite delay-time regimes from Eq.~\ref{eq:phi_film_predict} to the infinite delay-time regimes obtained from simulations of the full 1D model.
+These predictions were made based on the wall concentration trajectory obtained from Eq.~\ref{eq:phi_film_predict}.
+Trajectories that fall to the right of the spinodal envelope do not phase separate and give regime I. 
+Those that fall to the left have an interface that will cross the spinodal, giving regime II, and those that enter the spinodal obviously give regime III.
+For instance, the simple diffusion trajectory shown in Figure~\ref{fig-long_time_pred}(a) is an example of regime III since the concentration clearly enters the spinodal.
+
+Because polymer diffusion is much slower than solvent diffusion, the dilute-limit model predicts trajectories that are nearly parallel to lines of constant polymer composition, and accordingly, so are the regime predictions.
+As a consequence, any initial condition with a polymer concentration located between the \emph{binary} polymer/nonsolvent spinodal limits gives regime III.
+The intuition provided by this naive model is that a ternary solution with such a polymer concentration gives regime III at long times because all of the solvent is eventually replaced by nonsolvent.
+
+The simulation data do not agree with this prediction quantitatively, but the differences are instructive.
+The boundary between regimes I and III is in good agreement with the prediction, indicating that the lower-bound polymer concentration of the binary spinodal is an important threshold.
+The simulation data also predicts that the boundary between regimes II and III is shifted to the right relative to the prediction from the dilute-solution model.
+This shift is consistent with the trajectories of the full model in Figure~\ref{fig-long_time_pred}(a), where shrinkage and phase separation increase the polymer concentration at the wall, thereby narrowing the window for spinodal decomposition.
+
+Having mentioned it several times, we now turn our attention more fully to the subject of swelling and shrinking of the polymer film.
+As noted, film swelling and shrinkage plays an important role in determining the concentration of the film as time proceeds, and consequently, has an effect on the microstructure.
+Furthermore, as the polymer phase solidifies, swelling and shrinking can give rise to mechanical stresses, which have been proposed as a mechanism for the formation of macrovoids in polymer membranes~\cite{Prakash2008}.
+
+Similar to the other kinetic behavior we have observed so far, swelling and shrinking depends on the initial state of the film (in addition to the thermodynamic and kinetic parameters of the system).
+To examine the impact of the initial conditions, we re-process the raw data used to generate Figure~\ref{fig-long_time_pred} to track the location of the bath/film interface with time.
+Figure~\ref{fig-interface_motion}(a) shows the swelling fraction, 
+\begin{equation}
+z(t) = \frac{x_{\textrm{interface}}(t)}{x_{\textrm{interface}}(0)}
+\end{equation}
+at a long time ($t = 5000$ in simulation time) as a function of initial film concentration in composition space alongside the phase diagram.
+Figure~\ref{fig-interface_motion}(b) shows the time-trajectory of the interface of four of these initial conditions.
+
+\begin{figure}[tbp]
+  \includegraphics[width=3.25in]{fig11-interface_motion}
+  \caption{(a) Swelling fraction at $t = 5000$ of a large 1D simulation as a function of the initial film composition, obtained by tracking the interface between the bath and film.
+(b) Position of the interface versus time for the four specific initial conditions highlighted in panel (a).
+}
+  \label{fig-interface_motion}
+\end{figure}
+
+At low $\phi_{p}^{\txtf}$ (but still above the threshold concentration where the film phase separates), one observes films that shrink, and at high $\phi_{p}^{\txtf}$, the behavior inverts and swelling is observed.
+Some initial conditions result in substantial swelling and shrinkage. 
+For example, the film prepared in initial condition ``1'' shrinks nearly 50\% of the original film thickness, and the film prepared in initial condition ``4'' swells by about 50\%.
+Notably, we do not expect experiments to show swelling under the conditions described here, despite the prediction of the model.
+Instead, we anticipate that despite the driving force to swell, solidification processes (e.g.\ vitrification) will intervene at large $\phi_{p}$, and the film will arrest.
+
+From the perturbation theory outlined above, we expect film swelling or shrinking to be qualitatively similar to a Stefan problem.
+Accordingly, we infer that interface motion is the consequence of an imbalance of solvent and nonsolvent flux across the interface, which arises from a contrast between the chemical potential gradients of the two species.
+Reasoning along these lines, we hypothesize that the observed shrinking at low-to-moderate polymer concentration is due to a difference in miscibility.
+While the solvent is perfectly miscible in the nonsolvent bath, the nonsolvent is not perfectly miscible in the film because of the presence of the polymer, leading to a relatively smaller driving force (i.e. chemical potential gradient) for the nonsolvent at the interface.
+
+The swelling exhibited at high polymer concentration has a different origin.
+At large $\phi_{p}$ there is very little solvent in the film to begin with, and subsequently very little driving force for solvent to exit into the bath.
+The swelling observed in this (likely unrealistic) scenario is therefore due to nonsolvent diffusing into the film, driving the concentration towards the binodal line, which is actually at a lower $\phi_{p}$.
+
+From the perturbation theory, we also expect that the interface velocity will be the largest at $t=0$, and will monotonically approach zero as $t \rightarrow \infty$.
+These features are observed in some trajectories, such as initial conditions $1$ and $4$ in Figure~\ref{fig-interface_motion}, but not all.
+For example, initial conditions $2$ and $3$ in Figure~\ref{fig-interface_motion}(b) are actually non-monotonic, swelling initially before shrinking at long times.
+We conclude therefore that the analogy to the Stefan problem is only useful as a rough qualitative guide, and the full model must be used to understand the specific shrinking or swelling behavior of an individual case.
+
+Finally, we examine the microstructure of phase separating films in the late time-regime.
+Using an expanded set of initial conditions from the 1D simulations in Figure~\ref{fig-long_time_pred}, Figure~\ref{fig-late_time_morphology}(a) gives a ternary diagram with colored dots that mark the qualitatively different microstructures observed in the simulations.
+Figure~\ref{fig-late_time_morphology}(b-d) provides representative plots of those microstructures from 2D and 3D simulations. 
+
+\begin{figure*}[tbp]
+  \includegraphics[width=6.5in]{fig12-late_time_morphology}
+  \caption{(a) Long-time simulations exhibiting late-time regime III colored by the observed microstructure in 2D simulations: 
+non-solvent droplets in a polymer matrix (blue), alternating bands of polymer and nonsolvent (purple) and polymer droplets in nonsolvent (blue-green).
+2D contour plots ($128 R_{0}\times 128 R_{0}$) and 3D density plots ($128 R_{0}\times 64 R_{0} \times 32 R_{0}$) of the polymer concentration showing microstructure: (b) nonsolvent droplets, (c) alternating bands and (d) polymer droplets.
+The color bar on the right of (d) indicates polymer concentration and is valid for both 2D and 3D plots.
+}
+  \label{fig-late_time_morphology}
+\end{figure*}
+
+Figure~\ref{fig-late_time_morphology} shows that the microstructure, remarkably, is almost completely dictated by the initial polymer concentration in the film.
+Figure~\ref{fig-late_time_morphology}(a) shows three different morphologies for initial conditions inside late-time regime III, with transitions coming along lines nearly parallel to the polymer concentration.
+Figure~\ref{fig-late_time_morphology}(b-d) shows that the qualitative features of these morphologies are the same at late times as they are at early times.
+At low polymer concentration this leads to polymer-rich droplets in nonsolvent crossing over to the inverse morphology of nonsolvent-rich droplets in a polymer matrix at a high concentration.
+Other morphological features are also similar; a higher initial solvent concentration leads to a more shallow quench (with larger domains and a more diffuse interface), and an inhomogeneous polymer concentration leads to a thin polymer layers at the top of most of the observed morphologies.
+Additionally, the differences between 2D and 3D simulations are similar to those at early times, with droplet domains becoming elongated and connected in three dimensions.
+
+Thus, despite our lengthy exposition of regimes and kinetic paths, neither the delay time nor the way that the composition path enters the spinodal qualitatively determines the final microstructure.
+We suspect that this is true only because of the simplicity of our model.
+Specifically, our diffusive mobility does not arrest at a large polymer concentration, meaning diffusion proceeds normally even if polymer builds up at the interface as may easily happen in regime II.
+Coarsening also proceeds unhindered by a solidification process, which is also clearly a poor approximation of physical systems.
+% }}}
+
+\section{Concluding Remarks}
+% {{{
+We have examined the mass-transfer driven process of nonsolvent induced phase separation via a continuum, phase-field model of a ternary polymer solution.
+It is insightful to put these results into context within the broader experimental and theoretical literature on NIPS.
+In doing so, we note that our model has not been chosen to quantitatively match any specific polymer/solvent/nonsolvent system.
+Rather, it represents the simplest possible description of NIPS phenomena, and we seek here to compare to qualitative trends in the literature with the hope of gaining insight into the mechanisms universally shared by all NIPS processes.
+
+% t^{1/2}
+In Figure~\ref{fig-wall_concentration}, we show that the time it takes the nonsolvent to diffuse the thickness of the polymer film sets a timescale which governs the transition between ``early-time'' and ``late-time'' behavior.
+Additionally, Figures~\ref{fig-self_similarity} and \ref{fig-time_invariance} show that the film thickness can be removed as an independent variable at early times, and can be recast in terms of a similarity variable which is proportional to $t^{1/2}$ at late times.
+
+These results agree with both theoretical and experimental work by McHugh et al.~\cite{Tsay1990,McHugh1992,Gaides1992,McHugh1995a}, who were early pioneers of 1D NIPS mass transfer models (without phase separation kinetics). 
+The dimensional analysis of our simple diffusion model in Eq.~\ref{eq:1D_diffusion} is equally applicable to their diffusion-only models~\cite{Tsay1990}.
+In addition to their early modeling work, McHugh and coworkers used optical techniques to measure the concentration of solvent/nonsolvent in precipitating membranes on both the bath and film side of the interface~\cite{McHugh1992}.
+On the film side, they observe a diffusive front of nonsolvent moving into the membrane with a velocity that scales like $t^{1/2}$ as predicted~\cite{McHugh1992,McHugh1995a}.
+This observation of diffusive scaling leads directly to the same invariance of their precipitation experiments to film thickness that we observe in our model.
+However, in these experiments the same scaling does not apply on the bath side, which leads McHugh et al.\ to conclude that convection dominates the transport in the bath~\cite{Gaides1992}.
+We have not tested this hypothesis, but such a calculation could be done in the future using the model and code described here in simulations with both hydrodynamics and time-dependent boundary conditions.
+
+% Instantaneous/delayed precipitation
+In addition to the results related to film thickness, our model predicts three regimes of phase separation behavior at both early and late times: (I) a non-phase separating film/bath interface, (II) a phase separated film/bath interface and (III) a film that undergoes spinodal decomposition (Figures~\ref{fig-inf_domain}, \ref{fig-prediction}, \ref{fig-late_time_regimes} and \ref{fig-long_time_pred}).
+At early times, certain film compositions undergo immediate spinodal decomposition, even though the initial film composition is  not within the spinodal window.
+At late times, solvent and nonsolvent exchange drive a much larger set of film compositions into the spinodal envelope after a delay time.
+
+We hypothesize that regime III at early and late times corresponds to the oft-observed phenomena of ``instantaneous'' and ``delayed'' precipitation in NIPS experiments~\cite{Strathmann1975, vandeWitte1996, Reuvers1987, Reuvers1987a, Tsay1990, McHugh1992, McHugh1995a}. 
+As far as we know, ours are the first theoretical results predicting the existence of regime III in both early and late-time NIPS simulations.
+
+Classic 1D transport models of membrane formation were able to distinguish between regimes that did not cross the binodal (approximately regime I) and regimes that did (approximately regimes II and III)~\cite{Reuvers1987a, Tsay1990}.
+However, as our results show, the phase separation kinetics are more subtle than was previously assumed.
+In earlier models, researchers assumed that a system whose early-time composition path crossed into the binodal resulted in an instantaneous phase separation~\cite{Tsay1990}.
+From Figure~\ref{fig-inf_domain} it is clear that this assumption results in a much larger composition window for instantaneous precipitation than our model predicts.
+
+Nevertheless, we state the important caveat that the present model does not include thermal fluctuations, and therefore cannot account for nucleation phenomena.
+If a quench is sufficiently deep so that the nucleation time is small relative to the nonsolvent diffusion time, the size of the composition window where phase separation can occur could be significantly larger. 
+By contrast, shallow quenches with a large nucleation time will instead give rise to an additional mechanism for delayed precipitation.
+
+% Parameter/Film concentration studies
+% Add reference to late time param study: \ref{SI:fig-param_study_long}
+Figure~\ref{fig-late_time_regimes} shows how the delay time changes with the initial film composition and Figure~\ref{SI:fig-param_study} explores how the polymer/nonsolvent interaction parameter, nonsolvent/solvent interaction parameter, and polymer molecular weight influence the phase separation behavior of the model.
+The model predicts that the delay time will increase with increasing polymer concentration and decreasing nonsolvent concentration in the initial film.
+Also, a less miscible solvent/nonsolvent pair shrinks the window for early-time spinodal decomposition and delays phase separation, while a larger polymer/nonsolvent interaction parameter (a deeper quench) increases the early-time spinodal window and speeds up phase separation.
+
+While there is a large literature covering an array of polymer/solvent/nonsolvent systems, and exceptions can be found, these results qualitatively agree with experiment.
+For example, a classic review by Smolders examining macrovoid formation found that slower solvent/nonsolvent exchange accompanied 
+an increase in the polymer concentration or decreased nonsolvent concentration in the film, and a lower miscibility of the solvent in the nonsolvent (higher $\chi_{ns}$)~\cite{Smolders1992}.
+Similar results have been found in more recent literature~\cite{Nguyen1987, McHugh1992, Gaides1992, Barth2000, Holda2013, Guillen2013, Zhang2016h, Udoh2016}, with notable results by Ho{\l}da et al.\ who measure a linear increase in the delay time with increasing polymer concentration for polysulfone in N-methyl-2-pyrrolidone (NMP) and Tetrahydrofuran (THF)~\cite{Holda2013}.
+
+% Morphology and swelling
+Fig~\ref{fig-early_time_morphology} and Fig~\ref{fig-late_time_morphology} show two and three dimensional morphologies obtained from short and long time simulations of the NIPS process.
+The film morphology is largely dictated by the polymer concentration.
+At low polymer concentration, the polymer microstructure consists of disconnected droplets and at higher concentration the polymer domains percolate and nonsolvent voids are formed.
+Phase separation proceeds as a surface-directed travelling wave, giving rise to a thin layer of polymer at the top of most films.
+We do not observe a qualitative difference in morphology between the early time and late time simulations, nor do we observe noticeably asymmetric domain sizes, except those produced by rapidly coarsening domains near the top of the film.
+We also observe film shrinking and swelling. 
+As shown in Fig~\ref{fig-interface_motion}, the swelling ratio is a non-monotonic function of the polymer concentration, but shrinking is observed at low and intermediate polymer concentrations.
+
+Other simulations of inhomogeneous ternary phase separations are largely in agreement with those presented here.
+Zhou and Powell observe a thin polymer layer at the top of phase-separating films using a phase-field model~\cite{Zhou2006}, as does Akthakul et al.\ using a lattice Boltzmann model~\cite{Akthakul2005}.
+Recent DPD~\cite{Wang2008} and kinetic Monte Carlo~\cite{Termonia1994, He2011} simulations are less systematic, but the morphologies in their simulations do not appear to show a layer and are clearly strongly influenced by thermal fluctuations.
+
+Comparing to the experimental literature, it appears that our simulations (and all of the others of which we are aware) are still missing key pieces that are needed to fully explain experimental observations.
+We do not see important trends like a change in morphology based on fast or slow precipitation, nor do we observe the formation of macrovoids~\cite{Tree2018}.
+
+Nevertheless, there is some promising agreement with qualitative trends.
+Our model predicts that films will shrink at intermediate polymer concentrations, which is repeatedly seen in experiment~\cite{Udoh2016}.
+Also, it seems reasonable to hypothesize that the thin strip we observe at the top of our film may be one origin of the skin layer observed in many experiments~\cite{Strathmann1975, Smolders1992}.
+However, many membranes are also made with an evaporation step prior to NIPS, and there is strong evidence that evaporation time is correlated with skin formation~\cite{Strathmann1975,Holda2013}.
+
+More promising is the strong connection observed in experiments between the initial polymer concentration in the film and the final morphology~\cite{McHugh1992, Gaides1992, Barth2000, Su2009, Zhang2016h, Udoh2016}.
+For example, Zhang et al.\ observed that an increasing polymer concentration caused the morphology to transition from a more open finger-like structure to a more dense sponge-like structure, consistent with our simulation results~\cite{Zhang2016h}.
+Barth and coworkers have also claimed to see signatures of a change from spinodal decomposition to nucleation and growth kinetics using light scattering~\cite{Barth2000}.
+
+Clearly, we still do not fully understand the NIPS mechanism and much work remains.
+We still do not have a definitive answer to the origin of skin layers, asymmetric vertical pore size gradients or macrovoids.
+Two of the most important features that are missing from our model, nucleation and growth kinetics and solidification, are obvious frontiers for additional research.
+The fact that solidification plays an important role at a separate time scale is clear from experiments, which observe both a phase separating front and a ``gelation'' front in phase separating membranes~\cite{McHugh1992,McHugh1995a}.
+Additional areas of investigation include the interaction between pre-evaporation steps and NIPS, the role of coarsening, the unique impacts of viscoelasticity, the effects of fluid inertia and non-vitreous solidification processes, such as crystallization.
+While these phenomena are accessible via two-fluid models, some will require additional physics and different numerical methods, which (especially in the case of viscoelasticity) will almost certainly increase computational cost.
+% }}}
+
+\begin{acknowledgement}
+% {{{
+We would like to acknowledge financial support from Asahi Kasei Corporation, the MRSEC Program of the National Science Foundation through Grant No. DMR-1720256 (IRG-3), and from Brigham Young University. 
+Additionally, we acknowledge computational resources from the BYU Office of Research Computing and from the Center for Scientific Computing from the CNSI, MRL: an NSF MRSEC (DMR-1720256) and NSF CNS-1725797.
+% }}}
+\end{acknowledgement}
+
+\bibliography{refs}
+
+\end{document}
