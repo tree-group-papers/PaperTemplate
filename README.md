@@ -6,20 +6,25 @@ A "fork-able" template for writing a paper via LaTeX
 
 
 ## Storing Data
-**Data should not be stored via git!**
 
 Every paper has raw data associated with it.
 It is a good practice to store the raw data alongside the paper in a data/ directory.
 Unfortunately, git isn't a very useful tool for storing data.
 Every time you commit a replace a data file with a new one, it makes a copy, and this can end up generating huge repositories.
 This is bad, because it then takes forever to clone, commit, push and pull from repos, and we end up having to pay GitHub to store our data.
-We definitely don't want to do this, since we typically generate GB (and sometimes TB) of data!
+We definitely don't want to do this, since we typically generate GBs (and sometimes TBs) of data!
+To avoid this, follow this rule: **Do not store your raw data in a directory that is tracked via git**
 
-To get around this, I have set up a "data/" directory inside the template, but its contents are not "included" when you commit or push your repository.
-Instead, I have added a "hook" that runs every time you push your commits back to the repo.
-This hook is a bash script that syncs your data directory to the CAEDM ssh server.
+To help you keep this rule, I have set up a "data/" directory inside the paper template repository, but its contents are not included when you commit or push your repository.
+This is done via the .gitignore file inside the repository's main directory.
+This ensures that you can store your data locally along with your paper, but keep it out of the git repository.
+
+However, you still probably want your data to be backed up and shared with others.
+To facilitate this, I have added a "hook" that runs every time you push your commits back to the repo.
+The hook is a bash script that syncs your data directory to the CAEDM ssh server.
 This way your data stays backed up, and you can easily access it anytime you need to.
 Additionally, others in the group who are working on the paper should have access to your data and vice versa.
+Anytime you clone or pull from the repo, you can also sync your local data folder with the CAEDM server to your local machine.
 
 ### Setting up Data Storage
 * Set up ssh keys to the CAEDM ssh server
@@ -41,6 +46,7 @@ Notes:
 * This copies data from your local machine to the CAEDM server.
 If the files are large, this can take a long time.  
 * Retrieving data from the external server can only be done manually.
+This is to avoid possibly long retrival times the first time you clone the repo.
 
 * Manually: run sh/getdata.sh from the main directory of the repository.
 

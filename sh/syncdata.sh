@@ -10,6 +10,6 @@
 repopath=$(git rev-parse --show-toplevel)
 reponame=$(basename ${repopath})
 
-ssh ${USER}@ssh.et.byu.edu "mkdir -pf ~/groups/softmatter/Papers/data/$reponame-data"
+ssh ${USER}@ssh.et.byu.edu "mkdir -p ~/groups/softmatter/Papers/data/$reponame-data"
 rsync -avz --progress data/ ${USER}@ssh.et.byu.edu:~/groups/softmatter/Papers/data/$reponame-data/
 
