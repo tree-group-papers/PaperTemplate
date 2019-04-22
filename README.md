@@ -6,5 +6,6 @@ A "fork-able" template for writing a paper via LaTeX
 ## Storing Data
 **Data should not be stored via git!**
 
+* Set up ssh keys to caedm server
 
 
