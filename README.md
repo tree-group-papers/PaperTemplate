@@ -11,7 +11,7 @@ Typically this will be a copy of the simulation software you used, e.g. PFPD or 
 Analysis and plotting scripts will not normally be stored here.
 
 ### data
-This directory should store (i) **raw** data and (ii) the post-processed data and accompanying analysis scripts.
+This directory should store (i) *raw* data and (ii) the post-processed data and accompanying analysis scripts.
 Do not store "garbage" data in this directory.
 If you discover that the data is bad or that the runs failed, please delete the data.
 
@@ -28,7 +28,7 @@ More information about this directory and how it is backed up is detaled below.
 ### figures
 This directory stores the figures that will be in your paper or supplementary information.
 This directory should not include analysis scripts or raw data, but rather should only include the data necessary to make plots.
-Unlike the data directory, the figures directory **will** be stored in the git repository, so care should be taken about the size of files used here.
+Unlike the data directory, the figures directory *will* be stored in the git repository, so care should be taken about the size of files used here.
 
 Each figure should be stored in a separate sub-directory (e.g. fig-placeholder) inside figures.
 I typically name all of my figures with a prefix "fig-", as shown in the example.
@@ -39,7 +39,7 @@ Typically, these files will be copied from the analysis subdirectory of one of t
 You should make a note of where these files come from in a file named data\_paths.txt, so someone else (including you at a later date) can easily find the source location later.
 
 You should make your files in a plotting tool that can draw publication quality figures.
-Python, gnuplot and Matlab can all do this, but **Excel cannot**.
+Python, gnuplot and Matlab can all do this, but *Excel cannot*.
 You should save your files in a vector format like .eps or .pdf.
 Most journals prefer the .eps format.
 
@@ -62,7 +62,7 @@ You can delete these if you want.
 ### notes
 This directory is a place for you to store any notes, files or scripts that you want tracked in the repository but that don't fit elsewhere in the directory structure.
 
-#### revisions
+### revisions
 This directory is a place to track different stages of the revision process, including correspondence with co-authors and with journals.
 For example, you typically need to write a cover letter to the editor of the journal when you submit the paper.
 This directory is useful for storing these types of things.
