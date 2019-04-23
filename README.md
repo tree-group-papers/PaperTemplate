@@ -3,8 +3,17 @@ A "fork-able" template for writing a paper via LaTeX
 
 ## How to Use this Repo to Write a Paper
 
-Before you proceed, please read the short (3 page) [article](../notes/How_Write_a_Paper.Whitesides2004.pdf) by George Whitesides on how to write a paper.
+Congratulations, you are preparing to write a paper!
+Writing a paper is one of the most important parts of doing research.
+It is how data gets transmitted to the scientific community and how you get credit for doing the work.
+Good researchers start writing the paper while they are planning and executing their research.
+
+Before you proceed, please read the short (3 page) [article](https://onlinelibrary.wiley.com/doi/epdf/10.1002/adma.200400767) (a copy is also in the notes/ directory) by George Whitesides on how to write a paper.
 It is excellent and we will bascially follow the steps he outlines below.
+
+It will probably also be useful for you to look at a few papers for examples of what do to.
+One place to look is [our group publications](https://scholar.google.com/citations?user=ByuBvdUAAAAJ&hl=en).
+Focus on the structure of the papers, the way the sections are organized, etc.\ instead of the actual contents of the paper.
 
 ### Fork the repository
 First, fork this repository; a fork is simply a copy where you are the owner.
@@ -34,23 +43,34 @@ Please use one of these packages unless you know better.
 
 ### Make an outline
 As instructed by Whitesides, make an outline of your paper.
-The steps to do this are:
+Do this in the LaTeX document `manuscript.tex` (see the document for additional help and instructions).
+To make the outline, follow these steps:
 
-1. Write down (in any order) all the important ideas that you have concerning your paper.
+1. Get out a blank piece of paper and write down, in any order, all the important ideas that you have concerning your paper.
 These should include questions like "Why am I doing this work?", "What does it mean?", "What hypotheses am I testing?", "What results do I have or expect?", "What have others done?", "What is the prior state-of-the-art?"
-
-As part of this process, *sketch out (by hand) possible figures*
+As part of this process, *sketch out (by hand) all of the possible figures and schematics* that you have generated or will generate.
 
 2. Organize your ideas into three main sections:
-  I. Introduction
-  II. Results and Discussion
-  III. Conclusions.
 
-3. 
+    I. Introduction (Why did I do the work?)
+    II. Results and Discussion (What did I do?)
+    III. Conclusions (What does it mean?)
 
+3. Take each of the sections and organize them on a finer scale.
+Pay particular attention to how you organize the data and *figures*.
+Think about the story you are telling and how the paper will make the most logical sense when put together.
+*This may (and often does) include data you do not have or a figure you had not considered making previously*.
+One reason to make an outline early is to anticipate these types of logical holes.
 
-Do this in the LaTeX document `manuscript.tex`.
-More detailed instructions are contained in the `manuscript.tex` document.
+At this stage, you will want to type up your ideas in `manuscript.tex.`
+Typically your outline will only be a couple of pages long, will include only a few complete paragraphs and will have only a few key references.
+Put "placeholder figures" or scanned hand-drawings as stand-ins for the acutal figures you will make.
+It takes a long time to make figures; do not spend the time at this point.
+However, it is usually useful to add a caption that describes what the figure will contain.
+
+4. Once you have an outline, bring it (or email it) to me.
+I will give my opinion, suggest changes and give it back to you.
+We will typically iterate several times before we come to an outline that we agree on.
 
 ### Fill in your outline
 Once your outline is complete, you are ready to take data and write your paper!
@@ -69,8 +89,11 @@ Analysis and plotting scripts will not normally be stored here.
 
 ### data
 This directory should store (i) *raw* data and (ii) the post-processed data and accompanying analysis scripts.
+As described below, this directory should follow the principles outlined in the group data management plan (see `notes/Data_Management_Plan.odt`).
 Do not store "garbage" data in this directory.
-If you discover that the data is bad or that the runs failed, please delete the data.
+If you discover that the data is bad or that the runs have failed, please delete the data.
+(If you are still developing or debugging a code, you may have use some data that is useful but that may not fit with a paper.
+Store this data in a separate directory.)
 
 Typically, your data should be organized into "experiments" that were performed on a certain date (or range of dates).
 For example, suppose that you are running the Monte Carlo Polymer Crystallization (MCPC) code written by Pierre, and you are calculating the internal energy as a function of temperature using the parallel/CUDA code.

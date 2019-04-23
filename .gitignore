@@ -20,5 +20,10 @@ manuscript/manuscript.log
 manuscript/manuscript.blg
 manuscript/manuscript.aux
 manuscript/acs-manuscript.bib
+manuscript/suppinfo.bbl
+manuscript/suppinfo.log
+manuscript/suppinfo.blg
+manuscript/suppinfo.aux
+manuscript/acs-suppinfo.bib
 
 *.swp

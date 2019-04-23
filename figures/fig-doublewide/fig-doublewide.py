@@ -23,14 +23,10 @@ f1.writelines("""\
 \\setlength{\\unitlength}{1.0in}
 \\centering
 \\begin{picture}(6.5,2.44)
-  \\put(0.000,0.61){\\includegraphics[width=1.625in]{{{subfig-phase_diagram}}} }
-  \\put(0.750,2.22){\scriptsize(a)}
-  \\put(1.625,1.12){\\includegraphics[width=1.625in]{{{subfig-2D_run103}}} }
-  \\put(1.625,0.01){\\includegraphics[width=1.625in]{{{subfig-3D_run103}}} }
-  \\put(3.250,1.12){\\includegraphics[width=1.625in]{{{subfig-2D_run69}}} }
-  \\put(3.250,0.01){\\includegraphics[width=1.625in]{{{subfig-3D_run69}}} }
-  \\put(4.875,1.12){\\includegraphics[width=1.625in]{{{subfig-2D_run51}}} }
-  \\put(4.875,0.01){\\includegraphics[width=1.625in]{{{subfig-3D_run51}}} }
+  \\put(0.00,0.00){\\includegraphics[width=3.25in]{{{subfig-placeholder}}} }
+  \\put(0.00,2.35){\scriptsize(a)}
+  \\put(3.25,0.00){\\includegraphics[width=3.25in]{{{subfig-placeholder}}} }
+  \\put(3.25,2.35){\scriptsize(b)}
 \\end{picture}
 \\end{document}
 """
