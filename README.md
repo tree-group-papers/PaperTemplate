@@ -3,7 +3,78 @@ A "fork-able" template for writing a paper via LaTeX
 
 ## How to Use this Repo to Write a Paper
 
+## Directories
 
+### codes
+This directory should store the code or codes used to generate the raw data.
+Typically this will be a copy of the simulation software you used, e.g. PFPD or MCPC.
+Analysis and plotting scripts will not normally be stored here.
+
+### data
+This directory should store (i) **raw** data and (ii) the post-processed data and accompanying analysis scripts.
+Do not store "garbage" data in this directory.
+If you discover that the data is bad or that the runs failed, please delete the data.
+
+Typically, your data should be organized into "experiments" that were performed on a certain date (or range of dates).
+For example, suppose that you are running the Monte Carlo Polymer Crystallization (MCPC) code written by Pierre, and you are calculating the internal energy as a function of temperature using the parallel/CUDA code.
+You would store do your runs and then store your data in a directory named `E_versus_T_parallel.2019-04-23`.
+The data would be stored in a sub-directory named `raw_data`.
+Any analysis you perform should then be stored in another sub-directory named `analysis`.
+This could include Excel sheets, python scripts, preliminary plots, etc. that you are using to understand the data.
+
+Because this directory can hold a large amount of data, it will be ignored by the git repository.
+More information about this directory and how it is backed up is detaled below.
+
+### figures
+This directory stores the figures that will be in your paper or supplementary information.
+This directory should not include analysis scripts or raw data, but rather should only include the data necessary to make plots.
+Unlike the data directory, the figures directory **will** be stored in the git repository, so care should be taken about the size of files used here.
+
+Each figure should be stored in a separate sub-directory (e.g. fig-placeholder) inside figures.
+I typically name all of my figures with a prefix "fig-", as shown in the example.
+I do this so that my directory name, figure file-name and LaTeX reference are all the same, so I can easily keep track of the figures when I write.
+
+Inside each figure sub-director (e.g. fig-placeholder), you should have a fig-data sub-directory where you put the files you are using to plot your data.
+Typically, these files will be copied from the analysis subdirectory of one of the experiments in your data directory.
+You should make a note of where these files come from in a file named data\_paths.txt, so someone else (including you at a later date) can easily find the source location later.
+
+You should make your files in a plotting tool that can draw publication quality figures.
+Python, gnuplot and Matlab can all do this, but **Excel cannot**.
+You should save your files in a vector format like .eps or .pdf.
+Most journals prefer the .eps format.
+
+If you need to draw something, i.e. make a schematic, you should use a vector drawing program like Inkscape or Adobe Illustrator.
+This will allow you to save the figure in a vector format.
+Do not use a bitmap drawing program like Gimp or Adobe Photoshop.
+
+### manuscript
+This directory should contain:
+- The manuscript LaTeX file: manuscript.tex
+- The supplemental information LaTeX file: suppinfo.tex
+- The references .bib file: refs.bib
+- A copy of all of the figures in .eps format
+
+When you run pdfLaTeX on the manuscript.tex file (either on your machine or in Overleaf) you will generate a manuscript.pdf file with your figures.
+A number of other files (e.g. mauscript.log, manuscript.bbl) will also be generated.
+These latter files tell help LaTeX run or tell you what it did.
+You can delete these if you want.
+
+### notes
+This directory is a place for you to store any notes, files or scripts that you want tracked in the repository but that don't fit elsewhere in the directory structure.
+
+#### revisions
+This directory is a place to track different stages of the revision process, including correspondence with co-authors and with journals.
+For example, you typically need to write a cover letter to the editor of the journal when you submit the paper.
+This directory is useful for storing these types of things.
+
+### sh
+This directory stores some shell scripts that are useful when writing the paper.
+It currently includes:
+- maketex.sh: a script for rendering your LaTeX files
+- cleantex.sh: a script for deleting the "extra" files generated when pdflatex runs
+- makediff.sh: a script that creates a .pdf file highlighting what was changed from the last version of the document.
+- syncdata.sh: a script for syncing the data directory to the CAEDM group drive
+- getdata.sh: a script for syncing the CAEDM group drive to your data directory
 
 ## Storing Data
 
