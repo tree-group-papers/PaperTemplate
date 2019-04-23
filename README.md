@@ -13,7 +13,7 @@ Unfortunately, git isn't a very useful tool for storing data.
 Every time you commit a replace a data file with a new one, it makes a copy, and this can end up generating huge repositories.
 This is bad, because it then takes forever to clone, commit, push and pull from repos, and we end up having to pay GitHub to store our data.
 We definitely don't want to do this, since we typically generate GBs (and sometimes TBs) of data!
-To avoid this, follow this rule: **Do not store your raw data in a directory that is tracked via git**
+To avoid this, follow this rule: **Do not store your raw data in a directory that is tracked via git**.
 
 To help you keep this rule, I have set up a "data/" directory inside the paper template repository, but its contents are not included when you commit or push your repository.
 This is done via the .gitignore file inside the repository's main directory.

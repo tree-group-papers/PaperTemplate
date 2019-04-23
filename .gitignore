@@ -1,2 +1,7 @@
 data/*
 !/data/.gitkeep
+manuscript/manuscript.bbl
+manuscript/manuscript.log
+manuscript/manuscript.blg
+manuscript/manuscript.aux
+manuscript/acs-manuscript.bib
