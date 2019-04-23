@@ -3,6 +3,63 @@ A "fork-able" template for writing a paper via LaTeX
 
 ## How to Use this Repo to Write a Paper
 
+Before you proceed, please read the short (3 page) [article](../notes/How_Write_a_Paper.Whitesides2004.pdf) by George Whitesides on how to write a paper.
+It is excellent and we will bascially follow the steps he outlines below.
+
+### Fork the repository
+First, fork this repository; a fork is simply a copy where you are the owner.
+Since you want to be able to make changes and merge without my permission, and because you do not want to merge back into the template, please make a fork (as opposed to a branch).
+
+### Become familiar with LaTeX
+I require that you write all of your papers (and prospectus and proposals) in LaTeX.
+If you are not already familiar with LaTeX, spend a few minutes learning about it.
+There are many tutorials available online, but [this one](https://www.overleaf.com/learn/latex/Learn_LaTeX_in_30_minutes) by Overleaf seems pretty good.
+The [LaTeX wikibook](https://en.wikibooks.org/wiki/LaTeX) is also an excellent referece.
+
+In addition, you will need a LaTeX editor to write your documents.
+There are several choices:
+- Command line. If you use Linux (or Linux subsystem for Windows), you can simply use vim and the command line.
+This gives you the most control but also has the largest activation barrier.
+You may need to [install texlive](https://dzone.com/articles/installing-latex-ubuntu), if it isn't already installed.
+- [Overleaf](https://www.overleaf.com/) is a web-based interface for using LaTeX.
+This is essentially "Google Docs" for LaTeX.
+It is currently very popular, but has a "freemium" subscription model.
+Basically, you can use it for free, but the advanced features require paying.
+- [Lyx](https://www.lyx.org/) is an easier option for using LaTeX if you don't want to use Overleaf, but you don't feel comfortable with the command line. It is available on Linux, Windows and Mac.
+
+Most journals provide document classes for LaTeX that allow for easy submission.
+The ACS uses the package [achemso](https://ctan.org/pkg/achemso?lang=en) and the APS uses [revtex](https://journals.aps.org/revtex).
+The template provided here uses achemso, but it is relatively easy to switch if you need to.
+Please use one of these packages unless you know better.
+
+### Make an outline
+As instructed by Whitesides, make an outline of your paper.
+The steps to do this are:
+
+1. Write down (in any order) all the important ideas that you have concerning your paper.
+These should include questions like "Why am I doing this work?", "What does it mean?", "What hypotheses am I testing?", "What results do I have or expect?", "What have others done?", "What is the prior state-of-the-art?"
+
+As part of this process, *sketch out (by hand) possible figures*
+
+2. Organize your ideas into three main sections:
+  I. Introduction
+  II. Results and Discussion
+  III. Conclusions.
+
+3. 
+
+
+Do this in the LaTeX document `manuscript.tex`.
+More detailed instructions are contained in the `manuscript.tex` document.
+
+### Fill in your outline
+Once your outline is complete, you are ready to take data and write your paper!
+As noted by Whitesides, it is much more efficient to write your paper *while you take data.*
+Having the paper you want to write in mind will help guide you to make good decisions about what calculations ("experiments") you need to run and what analysis you need to do.
+As Whitesides says:
+> Do not, under any circumstances, wait until the collection of data is 'complete' before starting to write an outline. 
+> No project is ever complete and it saves enormous effort and much time to propose a plausivle paper and outline as soon as you see the basic structure of a project.
+
 ## Directories
 
 ### codes
@@ -49,13 +106,13 @@ Do not use a bitmap drawing program like Gimp or Adobe Photoshop.
 
 ### manuscript
 This directory should contain:
-- The manuscript LaTeX file: manuscript.tex
-- The supplemental information LaTeX file: suppinfo.tex
-- The references .bib file: refs.bib
+- The manuscript LaTeX file: `manuscript.tex`
+- The supplemental information LaTeX file: `suppinfo.tex`
+- The references .bib file: `refs.bib`
 - A copy of all of the figures in .eps format
 
 When you run pdfLaTeX on the manuscript.tex file (either on your machine or in Overleaf) you will generate a manuscript.pdf file with your figures.
-A number of other files (e.g. mauscript.log, manuscript.bbl) will also be generated.
+A number of other files (e.g. `mauscript.log`, `manuscript.bbl`) will also be generated.
 These latter files tell help LaTeX run or tell you what it did.
 You can delete these if you want.
 
