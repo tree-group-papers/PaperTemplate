@@ -41,6 +41,12 @@ The ACS uses the package [achemso](https://ctan.org/pkg/achemso?lang=en) and the
 The template provided here uses achemso, but it is relatively easy to switch if you need to.
 Please use one of these packages unless you know better.
 
+### Do a Literature Review
+Before making an outline, you should spend some time thinking about how your work is situated within the literature.
+Begin gathering the references you will need for your bibliography and store them in your preferred bibliography management software ([Jabref](http://www.jabref.org/), [Mendeley](https://www.mendeley.com/), [Endnote](https://endnote.com/), etc.).
+To help you as you read the literature, make a "Literature Review" document (e.g. in OpenOffice or Word) to record a few thoughts (in your own words) about the papers you read.
+Store these documents in the `notes` directory (see the given examples).
+
 ### Make an outline
 As instructed by Whitesides, make an outline of your paper.
 Do this in the LaTeX document `manuscript.tex` (see the document for additional help and instructions).
@@ -141,6 +147,8 @@ You can delete these if you want.
 
 ### notes
 This directory is a place for you to store any notes, files or scripts that you want tracked in the repository but that don't fit elsewhere in the directory structure.
+This is an especially good place to store your notes on the Literature and bibliography.
+I typically made a "Literature Review" document that summarizes the main points of important papers to help me when I'm reading.
 
 ### revisions
 This directory is a place to track different stages of the revision process, including correspondence with co-authors and with journals.
