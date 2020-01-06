@@ -48,7 +48,7 @@ To help you as you read the literature, make a "Literature Review" document (e.g
 Store these documents in the `notes` directory (see the given examples).
 
 ### Make an outline
-As instructed by Whitesides, make an outline of your paper (also useful: this article by Andrea Armani).
+As instructed by Whitesides, make an outline of your paper (also useful: [this article](https://spie.org/news/photonics-focus/janfeb-2020/how-to-write-a-scientific-paper?utm_id=ztwz) by Andrea Armani).
 Do this in the LaTeX document `manuscript.tex` (see the document for additional help and instructions).
 To make the outline, follow these steps:
 
