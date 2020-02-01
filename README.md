@@ -8,12 +8,13 @@ Writing a paper is one of the most important parts of doing research.
 It is how data gets transmitted to the scientific community and how you get credit for doing the work.
 Good researchers start writing the paper while they are planning and executing their research.
 
-Before you proceed, please read the short (3 page) [article](https://onlinelibrary.wiley.com/doi/epdf/10.1002/adma.200400767) (a copy is also in the notes/ directory) by George Whitesides on how to write a paper.
+Before you proceed, please read the short (3 page) [article](https://onlinelibrary.wiley.com/doi/epdf/10.1002/adma.200400767) (a copy is also in the notes/ directory) by George Whitesides on how to write a paper. 
 It is excellent and we will bascially follow the steps he outlines below.
+([This article](https://spie.org/news/photonics-focus/janfeb-2020/how-to-write-a-scientific-paper?utm_id=ztwz) by Andrea Armani is also very nice.)
 
 It will probably also be useful for you to look at a few papers for examples of what do to.
 One place to look is [our group publications](https://scholar.google.com/citations?user=ByuBvdUAAAAJ&hl=en).
-Focus on the structure of the papers, the way the sections are organized, etc.\ instead of the actual contents of the paper.
+Focus on the structure of the papers, the way the sections are organized, etc. instead of the actual contents of the paper.
 
 ### Fork the repository
 First, fork this repository; a fork is simply a copy where you are the owner.
@@ -48,7 +49,7 @@ To help you as you read the literature, make a "Literature Review" document (e.g
 Store these documents in the `notes` directory (see the given examples).
 
 ### Make an outline
-As instructed by Whitesides, make an outline of your paper (also useful: [this article](https://spie.org/news/photonics-focus/janfeb-2020/how-to-write-a-scientific-paper?utm_id=ztwz) by Andrea Armani).
+As instructed by Whitesides, make an outline of your paper.
 Do this in the LaTeX document `manuscript.tex` (see the document for additional help and instructions).
 To make the outline, follow these steps:
 
