@@ -186,6 +186,13 @@ This way your data stays backed up, and you can easily access it anytime you nee
 Additionally, others in the group who are working on the paper should have access to your data and vice versa.
 Anytime you clone or pull from the repo, you can also sync your local data folder with the CAEDM server to your local machine.
 
+One quick technical note about the pre-push hook: If you use Overleaf to store your paper and git to sync your data, Overleaf removes the execution permissions from the script that does the syncing. Enter this command
+```
+git config core.fileMode false
+chmod u+x sh/syncdata.sh 
+```
+into the head directory of the repository, and it will make Overleaf stop overwriting this permission locally.
+
 ### Setting up Data Storage
 * Set up ssh keys to the CAEDM ssh server
 * Make sure you have access to the "softmatter" CAEDM group
