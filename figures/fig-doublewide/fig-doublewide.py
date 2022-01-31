@@ -7,7 +7,7 @@
 ## Some notes:
 ## * Preamble geometry sets the size of the overall figure (in inches).
 ##   - Most journals have figures that are 3.25 inches wide for a single column
-##     and 6.25 inches for a double column.
+##     and 6.5 inches for a double column.
 ##   - I typically use a 4x3 image aspect ratio: 3.25 in wide and 2.44 in tall
 ##   - This makes a double-wide figure: 6.5in x 2.44 and a double tall figure: 
 ##     3.25in x 4.88 in.
